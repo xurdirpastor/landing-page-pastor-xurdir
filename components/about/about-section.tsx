@@ -16,7 +16,7 @@ export function AboutSection({
       <div className="mx-auto max-w-6xl px-6 py-[88px]">
         <div className="grid items-center gap-10 nav:grid-cols-[1fr_320px]">
           <div className="text-center nav:text-left">
-            <p className="text-sm font-bold tracking-[1.3px] text-blue-accent-text uppercase">
+            <p className="text-sm font-bold tracking-[1.3px] text-blue-accent-text uppercase nav:text-xl">
               {profile.aboutEyebrow}
             </p>
             <h2 className="mt-3 font-heading text-[clamp(32px,4.2vw,46px)] font-semibold text-foreground">

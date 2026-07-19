@@ -8,7 +8,7 @@ export function OfferingsSection({ settings }: { settings: OfferingSettings }) {
       <div className="divider-glow" />
       <div className="py-[88px]">
         <div className="mx-auto max-w-6xl px-6 text-center">
-          <p className="text-sm font-bold tracking-[1.3px] text-blue-accent-text uppercase">
+          <p className="text-sm font-bold tracking-[1.3px] text-blue-accent-text uppercase nav:text-xl">
             Dízimos e ofertas
           </p>
           <h2 className="mt-3 font-heading text-[clamp(32px,4.2vw,46px)] font-semibold text-foreground">
