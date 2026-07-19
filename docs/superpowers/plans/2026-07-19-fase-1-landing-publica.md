@@ -1,6 +1,8 @@
 # Fase 1 — Landing pública (read-only, dados seed) Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **STATUS: COMPLETE** (2026-07-19). Todas as 33 tasks executadas e verificadas — worktree isolado, merge fast-forward pra `main`. Depois do merge, uma rodada de correções via feedback visual ao vivo (12 commits) ajustou o que o texto abaixo não previu: `lucide-react` foi totalmente removido e substituído por `react-icons` (`react-icons/lu` genérico + `react-icons/fa` só pros 3 ícones de marca do rodapé — Task 24/28 abaixo ainda descrevem a versão lucide, superada); `Button`/`SheetClose` renderizados via `render={<a/>}` precisam de `nativeButton={false}` (Base UI, não previsto no texto); o `.divider-glow` (Task 1) só passou a ser usado de fato numa correção pós-merge, como linha sólida (não gradiente) no topo de cada seção — não como planejado originalmente; `Card` usa `border border-border` em vez do `ring-1 ring-foreground/10` original do shadcn; títulos de seção e o eyebrow acima deles ficaram maiores que o texto abaixo especifica. O resumo durável de cada mudança está no `CLAUDE.md` (§2, §5, §11) e no `PRD.md` §10 — este arquivo é o registro histórico da execução, não a fonte de verdade atual.
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Renderizar a home pública inteira (`/`) fiel ao protótipo (`design/`), lendo conteúdo real do Postgres via Prisma (seed, sem admin ainda).
 
