@@ -33,7 +33,7 @@
 **Interfaces:**
 - Produces: utilities Tailwind `text-text-secondary`, `bg-blue-primary`, `bg-blue-primary-dim`, `text-blue-accent`, `bg-blue-accent`, `hover:text-blue-accent-hover`/`hover:border-blue-accent`, `text-blue-accent-text`, `bg-bg-panel-2`/`bg-bg-panel-3`, `border-border-strong`, `bg-brand-accent`, `shadow-sm`/`shadow-md`/`shadow-glow`, classes `.bg-panel-gradient`, `.bg-card-gradient`, `.divider-glow`, breakpoint variant `nav:`/`max-nav:`.
 
-- [ ] **Step 1: Adicionar tokens brutos, sombras e breakpoint num novo bloco `@theme`**
+- [x] **Step 1: Adicionar tokens brutos, sombras e breakpoint num novo bloco `@theme`**
 
 Adicionar logo depois do bloco `@theme inline { ... }` existente (não misturar dentro dele, esse é referenciado por variável; este novo é valores estáticos):
 
@@ -58,7 +58,7 @@ Adicionar logo depois do bloco `@theme inline { ... }` existente (não misturar 
 }
 ```
 
-- [ ] **Step 2: Adicionar variáveis de gradiente (não são cores, ficam fora do `@theme`) e utilitárias**
+- [x] **Step 2: Adicionar variáveis de gradiente (não são cores, ficam fora do `@theme`) e utilitárias**
 
 Adicionar dentro do bloco `:root { ... }` existente, no final (antes do `}` de fechamento):
 
@@ -85,7 +85,7 @@ E adicionar um novo `@layer utilities` no final do arquivo:
 }
 ```
 
-- [ ] **Step 3: Fundo radial do body + cor de seleção de texto**
+- [x] **Step 3: Fundo radial do body + cor de seleção de texto**
 
 Dentro do `@layer base { ... }` existente, trocar a regra `body { @apply bg-background text-foreground; }` por:
 
@@ -105,12 +105,12 @@ E adicionar, ainda dentro de `@layer base`, depois da regra de `html`:
   }
 ```
 
-- [ ] **Step 4: Verificar que o build não quebra**
+- [x] **Step 4: Verificar que o build não quebra**
 
 Run: `bun run build`
 Expected: build conclui sem erro (pode haver warnings sobre imagens remotas — resolvido no Task 2).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/globals.css
@@ -127,7 +127,7 @@ git commit -m "feat: add prototype design tokens (raw colors, shadows, breakpoin
 **Interfaces:**
 - Produces: `next/image` funcional para URLs `picsum.photos` (seed) e do bucket Supabase Storage (`*.supabase.co/storage/v1/object/public/**`, ainda sem uso nesta fase, mas necessário assim que a Fase 2 subir imagem real).
 
-- [ ] **Step 1: Editar `next.config.ts`**
+- [x] **Step 1: Editar `next.config.ts`**
 
 ```ts
 import type { NextConfig } from "next";
@@ -148,12 +148,12 @@ const nextConfig: NextConfig = {
 export default nextConfig;
 ```
 
-- [ ] **Step 2: Verificar**
+- [x] **Step 2: Verificar**
 
 Run: `bun run build`
 Expected: build conclui sem erro de configuração de imagem.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add next.config.ts
@@ -173,7 +173,7 @@ git commit -m "feat: allow remote images from picsum.photos and Supabase Storage
 
 Já verificado nesta sessão (primeira execução real do CLI 4.13.1 neste projeto — pendência do CLAUDE.md §10): `--yes` evita qualquer prompt interativo.
 
-- [ ] **Step 1: Rodar o instalador**
+- [x] **Step 1: Rodar o instalador**
 
 Run: `bunx shadcn@latest add card badge avatar separator sheet carousel --yes`
 Expected (confirmado nesta sessão):
@@ -192,12 +192,12 @@ Expected (confirmado nesta sessão):
 ```
 (`embla-carousel-react` entra como dependência nova em `package.json`.)
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erros novos introduzidos pelos arquivos gerados.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/ui/card.tsx components/ui/badge.tsx components/ui/avatar.tsx components/ui/separator.tsx components/ui/sheet.tsx components/ui/carousel.tsx package.json bun.lock
@@ -217,7 +217,7 @@ git commit -m "feat: add shadcn card, badge, avatar, separator, sheet and carous
 
 Ajuste de tema explicitamente permitido pelo CLAUDE.md §4/§6 em arquivos `components/ui/` (gerado, mas "ajustes de tema" são ok).
 
-- [ ] **Step 1: Adicionar as duas variantes**
+- [x] **Step 1: Adicionar as duas variantes**
 
 Em `components/ui/badge.tsx`, dentro de `variants.variant`, adicionar (depois de `link: ...`):
 
@@ -227,12 +227,12 @@ Em `components/ui/badge.tsx`, dentro de `variants.variant`, adicionar (depois de
           "border border-border-strong bg-background/70 text-foreground backdrop-blur-sm",
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro (as duas chaves novas em `variants.variant` são inferidas automaticamente por `VariantProps<typeof badgeVariants>`).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/ui/badge.tsx
@@ -250,7 +250,7 @@ git commit -m "feat: add presencial/online badge variants for agenda items"
 **Interfaces:**
 - Produces: `formatPriceBRL(price: number | string): string`.
 
-- [ ] **Step 1: Escrever o teste que falha**
+- [x] **Step 1: Escrever o teste que falha**
 
 ```ts
 // lib/format/price.test.ts
@@ -268,12 +268,12 @@ describe('formatPriceBRL', () => {
 })
 ```
 
-- [ ] **Step 2: Rodar e confirmar que falha**
+- [x] **Step 2: Rodar e confirmar que falha**
 
 Run: `bun test lib/format/price.test.ts`
 Expected: FAIL — `Cannot find module './price'`.
 
-- [ ] **Step 3: Implementar**
+- [x] **Step 3: Implementar**
 
 ```ts
 // lib/format/price.ts
@@ -285,12 +285,12 @@ export function formatPriceBRL(price: number | string): string {
 }
 ```
 
-- [ ] **Step 4: Rodar e confirmar que passa**
+- [x] **Step 4: Rodar e confirmar que passa**
 
 Run: `bun test lib/format/price.test.ts`
 Expected: PASS (2 testes).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/format/price.ts lib/format/price.test.ts
@@ -308,7 +308,7 @@ git commit -m "feat: add formatPriceBRL pure formatter with tests"
 **Interfaces:**
 - Produces: `isAgendaItemVisible(item: { isPublished: boolean; date: Date }, now: Date): boolean`, `sortByOrder<T extends { order: number }>(items: T[]): T[]`.
 
-- [ ] **Step 1: Escrever os testes que falham**
+- [x] **Step 1: Escrever os testes que falham**
 
 ```ts
 // lib/format/date.test.ts
@@ -357,12 +357,12 @@ describe('sortByOrder', () => {
 })
 ```
 
-- [ ] **Step 2: Rodar e confirmar que falha**
+- [x] **Step 2: Rodar e confirmar que falha**
 
 Run: `bun test lib/format/date.test.ts`
 Expected: FAIL — `Cannot find module './date'`.
 
-- [ ] **Step 3: Implementar**
+- [x] **Step 3: Implementar**
 
 ```ts
 // lib/format/date.ts
@@ -378,12 +378,12 @@ export function sortByOrder<T extends { order: number }>(items: T[]): T[] {
 }
 ```
 
-- [ ] **Step 4: Rodar e confirmar que passa**
+- [x] **Step 4: Rodar e confirmar que passa**
 
 Run: `bun test lib/format/date.test.ts`
 Expected: PASS (5 testes).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/format/date.ts lib/format/date.test.ts
@@ -401,7 +401,7 @@ git commit -m "feat: add agenda visibility/sort pure helpers with tests"
 **Interfaces:**
 - Produces: `crc16ccitt(input: string): string` (retorna 4 chars hex maiúsculo).
 
-- [ ] **Step 1: Escrever o teste que falha**
+- [x] **Step 1: Escrever o teste que falha**
 
 Usamos o valor de referência padrão (documentado publicamente) do CRC-16/CCITT-FALSE para a string de teste `"123456789"` — não é um fixture nosso, é a constante de verificação do algoritmo em si.
 
@@ -421,12 +421,12 @@ describe('crc16ccitt', () => {
 })
 ```
 
-- [ ] **Step 2: Rodar e confirmar que falha**
+- [x] **Step 2: Rodar e confirmar que falha**
 
 Run: `bun test lib/pix/crc16.test.ts`
 Expected: FAIL — `Cannot find module './crc16'`.
 
-- [ ] **Step 3: Implementar**
+- [x] **Step 3: Implementar**
 
 ```ts
 // lib/pix/crc16.ts
@@ -445,12 +445,12 @@ export function crc16ccitt(input: string): string {
 }
 ```
 
-- [ ] **Step 4: Rodar e confirmar que passa**
+- [x] **Step 4: Rodar e confirmar que passa**
 
 Run: `bun test lib/pix/crc16.test.ts`
 Expected: PASS (2 testes).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/pix/crc16.ts lib/pix/crc16.test.ts
@@ -469,7 +469,7 @@ git commit -m "feat: add CRC16/CCITT-FALSE checksum with standard test vector"
 - Consumes: `crc16ccitt` de `./crc16` (Task 7).
 - Produces: `buildPixPayload(params: { key: string; merchantName: string; merchantCity: string }): string` — usado por `PixCard` (Task 29).
 
-- [ ] **Step 1: Escrever os testes que falham**
+- [x] **Step 1: Escrever os testes que falham**
 
 ```ts
 // lib/pix/br-code.test.ts
@@ -505,12 +505,12 @@ describe('buildPixPayload', () => {
 })
 ```
 
-- [ ] **Step 2: Rodar e confirmar que falha**
+- [x] **Step 2: Rodar e confirmar que falha**
 
 Run: `bun test lib/pix/br-code.test.ts`
 Expected: FAIL — `Cannot find module './br-code'`.
 
-- [ ] **Step 3: Implementar**
+- [x] **Step 3: Implementar**
 
 ```ts
 // lib/pix/br-code.ts
@@ -543,12 +543,12 @@ export function buildPixPayload(params: {
 }
 ```
 
-- [ ] **Step 4: Rodar e confirmar que passa**
+- [x] **Step 4: Rodar e confirmar que passa**
 
 Run: `bun test lib/pix/br-code.test.ts`
 Expected: PASS (4 testes).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/pix/br-code.ts lib/pix/br-code.test.ts
@@ -567,7 +567,7 @@ git commit -m "feat: add Pix BR Code/EMV payload builder with tests"
 **Interfaces:**
 - Produces: 3 `AboutPillar` (`icon` ∈ `'file-text' | 'clock' | 'user-plus'`, consumidos pelo mapa de ícones do Task 17), 4 `AgendaItem` (mistura `presencial`/`online`, com casos de expiração), 1 `Book`, 4 `Testimonial`.
 
-- [ ] **Step 1: Adicionar os novos upserts em `prisma/seed.ts`**
+- [x] **Step 1: Adicionar os novos upserts em `prisma/seed.ts`**
 
 Adicionar dentro de `main()`, depois do upsert de `pastorProfile` e antes do de `videoHighlight`:
 
@@ -713,12 +713,12 @@ Adicionar dentro de `main()`, depois do upsert de `pastorProfile` e antes do de 
   })
 ```
 
-- [ ] **Step 2: Rodar o seed contra o banco real**
+- [x] **Step 2: Rodar o seed contra o banco real**
 
 Run: `bunx prisma db seed`
 Expected: log final `Seed concluído.` sem erro.
 
-- [ ] **Step 3: Conferir contagem via Supabase MCP**
+- [x] **Step 3: Conferir contagem via Supabase MCP**
 
 Usar a tool `mcp__plugin_supabase_supabase__execute_sql` com:
 ```sql
@@ -730,7 +730,7 @@ select
 ```
 Expected: `pillars=3, agenda=4, books=1, testimonials=4`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add prisma/seed.ts
@@ -748,7 +748,7 @@ git commit -m "feat: expand seed with realistic AboutPillar, AgendaItem, Book an
 - Consumes: `prisma` de `@/lib/prisma` (Fase 0).
 - Produces: `getPastorProfile(): Promise<PastorProfile>`, `getAboutPillars(): Promise<AboutPillar[]>` — tag de cache `"about"`.
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```ts
 // lib/content/about.ts
@@ -773,12 +773,12 @@ export const getAboutPillars = unstable_cache(
 )
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add lib/content/about.ts
@@ -796,7 +796,7 @@ git commit -m "feat: add cached content readers for pastor profile and about pil
 - Consumes: `isAgendaItemVisible` de `@/lib/format/date` (Task 6).
 - Produces: `getAgendaItems(): Promise<AgendaItem[]>` — já filtrado por `isPublished`+data e ordenado, tag `"agenda"`.
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```ts
 // lib/content/agenda.ts
@@ -816,12 +816,12 @@ export const getAgendaItems = unstable_cache(
 )
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add lib/content/agenda.ts
@@ -838,7 +838,7 @@ git commit -m "feat: add cached agenda reader with visibility filter"
 **Interfaces:**
 - Produces: `getBooks(): Promise<Book[]>` (tag `"books"`), `getVideoHighlight(): Promise<VideoHighlight>` (tag `"video"`), `getTestimonials(): Promise<Testimonial[]>` (tag `"testimonials"`), `getOfferingSettings(): Promise<OfferingSettings>` (tag `"offerings"`), `getFooterSettings(): Promise<FooterSettings>` (tag `"footer"`).
 
-- [ ] **Step 1: `lib/content/books.ts`**
+- [x] **Step 1: `lib/content/books.ts`**
 
 ```ts
 import { unstable_cache } from 'next/cache'
@@ -854,7 +854,7 @@ export const getBooks = unstable_cache(
 )
 ```
 
-- [ ] **Step 2: `lib/content/video.ts`**
+- [x] **Step 2: `lib/content/video.ts`**
 
 ```ts
 import { unstable_cache } from 'next/cache'
@@ -870,7 +870,7 @@ export const getVideoHighlight = unstable_cache(
 )
 ```
 
-- [ ] **Step 3: `lib/content/testimonials.ts`**
+- [x] **Step 3: `lib/content/testimonials.ts`**
 
 ```ts
 import { unstable_cache } from 'next/cache'
@@ -889,7 +889,7 @@ export const getTestimonials = unstable_cache(
 )
 ```
 
-- [ ] **Step 4: `lib/content/offerings.ts`**
+- [x] **Step 4: `lib/content/offerings.ts`**
 
 ```ts
 import { unstable_cache } from 'next/cache'
@@ -905,7 +905,7 @@ export const getOfferingSettings = unstable_cache(
 )
 ```
 
-- [ ] **Step 5: `lib/content/footer.ts`**
+- [x] **Step 5: `lib/content/footer.ts`**
 
 ```ts
 import { unstable_cache } from 'next/cache'
@@ -921,12 +921,12 @@ export const getFooterSettings = unstable_cache(
 )
 ```
 
-- [ ] **Step 6: Verificar tipos**
+- [x] **Step 6: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add lib/content/books.ts lib/content/video.ts lib/content/testimonials.ts lib/content/offerings.ts lib/content/footer.ts
@@ -943,7 +943,7 @@ git commit -m "feat: add cached content readers for books, video, testimonials, 
 **Interfaces:**
 - Produces: `getPillarIcon(slug: string): LucideIcon` — usado por `AboutSection` (Task 19). Slugs suportados: `'file-text' | 'clock' | 'user-plus'` (batem com o seed do Task 9); qualquer outro slug cai no fallback `Sparkles`.
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```tsx
 // lib/icons/pillar-icons.tsx
@@ -960,12 +960,12 @@ export function getPillarIcon(slug: string): LucideIcon {
 }
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add lib/icons/pillar-icons.tsx
@@ -983,7 +983,7 @@ git commit -m "feat: add slug-to-lucide-icon map for about pillars"
 - Consumes: `Button`/`buttonVariants` de `@/components/ui/button`, `Sheet*` de `@/components/ui/sheet` (Task 3), `cn` de `@/lib/utils`.
 - Produces: `<Navbar />` (Server Component, sem props) — usado por `app/page.tsx` (Task 31). Itens de navegação (confirmado contra o protótipo, não só o texto do PRD §4 — ver spec §1): Sobre `#sobre`, Agenda `#agenda`, Palavra `#video`, Livros `#livros`, Depoimentos `#depoimentos`, Ofertas `#ofertas`.
 
-- [ ] **Step 1: `components/navbar/mobile-menu.tsx`**
+- [x] **Step 1: `components/navbar/mobile-menu.tsx`**
 
 ```tsx
 'use client'
@@ -1040,7 +1040,7 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
 }
 ```
 
-- [ ] **Step 2: `components/navbar/navbar.tsx`**
+- [x] **Step 2: `components/navbar/navbar.tsx`**
 
 ```tsx
 import { Button } from '@/components/ui/button'
@@ -1091,12 +1091,12 @@ export function Navbar() {
 }
 ```
 
-- [ ] **Step 3: Verificar tipos**
+- [x] **Step 3: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add components/navbar/navbar.tsx components/navbar/mobile-menu.tsx
@@ -1114,7 +1114,7 @@ git commit -m "feat: add navbar with mobile Sheet menu"
 - Consumes: `Button` de `@/components/ui/button`, tipo `PastorProfile` de `@/lib/generated/prisma/client`.
 - Produces: `<HeroSection profile={profile} />` — usado por `app/page.tsx` (Task 31).
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```tsx
 // components/about/hero-section.tsx
@@ -1171,12 +1171,12 @@ export function HeroSection({ profile }: { profile: PastorProfile }) {
 }
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/about/hero-section.tsx
@@ -1194,7 +1194,7 @@ git commit -m "feat: add hero section reading PastorProfile"
 - Consumes: `Card` de `@/components/ui/card`, `getPillarIcon` de `@/lib/icons/pillar-icons` (Task 13), tipos `PastorProfile`/`AboutPillar`.
 - Produces: `<AboutSection profile={profile} pillars={pillars} />` — usado por `app/page.tsx` (Task 31).
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```tsx
 // components/about/about-section.tsx
@@ -1264,12 +1264,12 @@ export function AboutSection({
 }
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/about/about-section.tsx
@@ -1287,7 +1287,7 @@ git commit -m "feat: add about section with family photo and pillar cards"
 - Consumes: `Badge` de `@/components/ui/badge` com variants `presencial`/`online` (Task 4), tipo `AgendaType` de `@/lib/generated/prisma/client`.
 - Produces: `<AgendaBadge type={item.type} />` — usado por `AgendaCard` (Task 18).
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```tsx
 // components/agenda/agenda-badge.tsx
@@ -1308,12 +1308,12 @@ export function AgendaBadge({ type }: { type: AgendaType }) {
 }
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/agenda/agenda-badge.tsx
@@ -1331,7 +1331,7 @@ git commit -m "feat: add agenda badge for presencial/online types"
 - Consumes: `Card` de `@/components/ui/card`, `AgendaBadge` (Task 17), tipo `AgendaItem`.
 - Produces: `<AgendaCard item={item} />` — usado por `AgendaCarousel` (Task 20).
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```tsx
 // components/agenda/agenda-card.tsx
@@ -1370,12 +1370,12 @@ export function AgendaCard({ item }: { item: AgendaItem }) {
 }
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/agenda/agenda-card.tsx
@@ -1393,7 +1393,7 @@ git commit -m "feat: add agenda card"
 - Consumes: `Carousel`/`CarouselContent`/`CarouselItem`/`CarouselPrevious`/`CarouselNext` de `@/components/ui/carousel` (Task 3), `AgendaCard` (Task 18).
 - Produces: `<AgendaCarousel items={items} />` (client) — usado por `AgendaSection` (Task 20).
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```tsx
 // components/agenda/agenda-carousel.tsx
@@ -1428,12 +1428,12 @@ export function AgendaCarousel({ items }: { items: AgendaItem[] }) {
 }
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/agenda/agenda-carousel.tsx
@@ -1451,7 +1451,7 @@ git commit -m "feat: add agenda carousel using shadcn Carousel (Embla)"
 - Consumes: `AgendaCarousel` (Task 19).
 - Produces: `<AgendaSection items={items} />` — usado por `app/page.tsx` (Task 31).
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```tsx
 // components/agenda/agenda-section.tsx
@@ -1483,12 +1483,12 @@ export function AgendaSection({ items }: { items: AgendaItem[] }) {
 }
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/agenda/agenda-section.tsx
@@ -1506,7 +1506,7 @@ git commit -m "feat: add agenda section"
 - Consumes: `Button` de `@/components/ui/button`, tipo `VideoHighlight`.
 - Produces: `<VideoSection video={video} />` — usado por `app/page.tsx` (Task 31).
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```tsx
 // components/video/video-section.tsx
@@ -1565,12 +1565,12 @@ export function VideoSection({ video }: { video: VideoHighlight }) {
 }
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/video/video-section.tsx
@@ -1588,7 +1588,7 @@ git commit -m "feat: add video highlight section"
 - Consumes: `Card`/`Button` de `@/components/ui`, `formatPriceBRL` de `@/lib/format/price` (Task 5).
 - Produces: `<BooksSection books={books} />` — usado por `app/page.tsx` (Task 31).
 
-- [ ] **Step 1: `components/books/book-card.tsx`**
+- [x] **Step 1: `components/books/book-card.tsx`**
 
 ```tsx
 import Image from 'next/image'
@@ -1624,7 +1624,7 @@ export function BookCard({ book }: { book: Book }) {
 }
 ```
 
-- [ ] **Step 2: `components/books/books-section.tsx`**
+- [x] **Step 2: `components/books/books-section.tsx`**
 
 ```tsx
 import { BookCard } from './book-card'
@@ -1649,12 +1649,12 @@ export function BooksSection({ books }: { books: Book[] }) {
 }
 ```
 
-- [ ] **Step 3: Verificar tipos**
+- [x] **Step 3: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add components/books/book-card.tsx components/books/books-section.tsx
@@ -1672,7 +1672,7 @@ git commit -m "feat: add books section"
 - Consumes: `Avatar`/`AvatarFallback`/`Card` de `@/components/ui` (Task 3).
 - Produces: `<TestimonialsSection testimonials={testimonials} />` — usado por `app/page.tsx` (Task 31).
 
-- [ ] **Step 1: `components/testimonials/testimonial-card.tsx`**
+- [x] **Step 1: `components/testimonials/testimonial-card.tsx`**
 
 ```tsx
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -1702,7 +1702,7 @@ export function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 }
 ```
 
-- [ ] **Step 2: `components/testimonials/testimonials-section.tsx`**
+- [x] **Step 2: `components/testimonials/testimonials-section.tsx`**
 
 ```tsx
 import { TestimonialCard } from './testimonial-card'
@@ -1732,12 +1732,12 @@ export function TestimonialsSection({ testimonials }: { testimonials: Testimonia
 }
 ```
 
-- [ ] **Step 3: Verificar tipos**
+- [x] **Step 3: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add components/testimonials/testimonial-card.tsx components/testimonials/testimonials-section.tsx
@@ -1755,12 +1755,12 @@ git commit -m "feat: add testimonials section"
 **Interfaces:**
 - Produces: `<CopyButton value={string} />` (client) — usado por `PixCard` (Task 25).
 
-- [ ] **Step 1: Instalar a lib de QR**
+- [x] **Step 1: Instalar a lib de QR**
 
 Run: `bun add react-qr-code`
 Expected: `package.json`/`bun.lock` atualizados, sem erro.
 
-- [ ] **Step 2: Implementar o botão de copiar**
+- [x] **Step 2: Implementar o botão de copiar**
 
 ```tsx
 // components/offerings/copy-button.tsx
@@ -1788,12 +1788,12 @@ export function CopyButton({ value }: { value: string }) {
 }
 ```
 
-- [ ] **Step 3: Verificar tipos**
+- [x] **Step 3: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add package.json bun.lock components/offerings/copy-button.tsx
@@ -1811,7 +1811,7 @@ git commit -m "feat: add copy-to-clipboard button for the Pix key"
 - Consumes: `buildPixPayload` de `@/lib/pix/br-code` (Task 8), `CopyButton` (Task 24), `react-qr-code`.
 - Produces: `<PixCard settings={settings} />` (client) — usado por `OfferingsSection` (Task 27).
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```tsx
 // components/offerings/pix-card.tsx
@@ -1847,12 +1847,12 @@ export function PixCard({ settings }: { settings: OfferingSettings }) {
 }
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/offerings/pix-card.tsx
@@ -1870,7 +1870,7 @@ git commit -m "feat: add Pix card with client-generated QR"
 - Consumes: `Card`/`Separator` de `@/components/ui`.
 - Produces: `<BankCard title={string} rows={{ label: string; value: string }[]} />` — usado por `OfferingsSection` (Task 27).
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```tsx
 // components/offerings/bank-card.tsx
@@ -1899,12 +1899,12 @@ export function BankCard({ title, rows }: { title: string; rows: Row[] }) {
 }
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/offerings/bank-card.tsx
@@ -1922,7 +1922,7 @@ git commit -m "feat: add bank details card for offerings section"
 - Consumes: `PixCard` (Task 25), `BankCard` (Task 26).
 - Produces: `<OfferingsSection settings={settings} />` — usado por `app/page.tsx` (Task 31).
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```tsx
 // components/offerings/offerings-section.tsx
@@ -1975,12 +1975,12 @@ export function OfferingsSection({ settings }: { settings: OfferingSettings }) {
 }
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/offerings/offerings-section.tsx
@@ -1997,7 +1997,7 @@ git commit -m "feat: add offerings section (Pix + national + international accou
 **Interfaces:**
 - Produces: `<Footer settings={settings} />` — usado por `app/page.tsx` (Task 31).
 
-- [ ] **Step 1: Implementar**
+- [x] **Step 1: Implementar**
 
 ```tsx
 // components/footer/footer.tsx
@@ -2085,12 +2085,12 @@ export function Footer({ settings }: { settings: FooterSettings }) {
 }
 ```
 
-- [ ] **Step 2: Verificar tipos**
+- [x] **Step 2: Verificar tipos**
 
 Run: `bunx tsc --noEmit`
 Expected: sem erro.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add components/footer/footer.tsx
@@ -2108,7 +2108,7 @@ git commit -m "feat: add footer with social links and copyright"
 - Consumes: todas as seções (Tasks 14–28) e todos os `lib/content/*` (Tasks 10–12).
 - Produces: página `/` completa.
 
-- [ ] **Step 1: Substituir `app/page.tsx`**
+- [x] **Step 1: Substituir `app/page.tsx`**
 
 ```tsx
 import { Navbar } from '@/components/navbar/navbar'
@@ -2159,12 +2159,12 @@ export default async function Home() {
 }
 ```
 
-- [ ] **Step 2: Rodar o build**
+- [x] **Step 2: Rodar o build**
 
 Run: `bun run build`
 Expected: build conclui com sucesso, `/` prerenderizada (Server Component, sem erro de tipo/import).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add app/page.tsx
@@ -2180,7 +2180,7 @@ git commit -m "feat: assemble public homepage from all Fase 1 sections"
 
 **Interfaces:** nenhuma (documentação).
 
-- [ ] **Step 1: Substituir o bloco da árvore de diretórios em `CLAUDE.md` §4**
+- [x] **Step 1: Substituir o bloco da árvore de diretórios em `CLAUDE.md` §4**
 
 Trocar:
 ```
@@ -2238,7 +2238,7 @@ design/                 # NÃO editar — fonte de verdade visual (PDF de tokens
 proxy.ts                # checagem otimista de sessão para /admin (substitui o antigo middleware.ts)
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add CLAUDE.md
@@ -2251,11 +2251,11 @@ git commit -m "docs: update CLAUDE.md structure to match Fase 1 components/lib l
 
 **Files:** nenhum arquivo de código (verificação manual assistida por Playwright).
 
-- [ ] **Step 1: Subir o servidor de dev**
+- [x] **Step 1: Subir o servidor de dev**
 
 Run: `bun run dev &` (background) — aguardar `Ready` no log.
 
-- [ ] **Step 2: Abrir no Playwright em viewport desktop (1600×1200) e navegar**
+- [x] **Step 2: Abrir no Playwright em viewport desktop (1600×1200) e navegar**
 
 Usar `mcp__plugin_playwright_playwright__browser_navigate` para `http://localhost:3000`, depois `browser_resize` para `1600x1200`, e `browser_take_screenshot` de cada seção (scroll via `browser_evaluate` com `window.scrollTo`) comparando lado a lado com:
 - `design/screenshots/desktop/Screenshot 2026-07-18 at 22.03.01.png` (navbar + hero)
@@ -2264,15 +2264,15 @@ Usar `mcp__plugin_playwright_playwright__browser_navigate` para `http://localhos
 - `design/screenshots/desktop/Screenshot 2026-07-18 at 22.04.05.png` (depoimentos + ofertas)
 - `design/screenshots/desktop/Screenshot 2026-07-18 at 22.04.18.png` (ofertas + rodapé)
 
-- [ ] **Step 3: Ajustar diferenças perceptíveis**
+- [x] **Step 3: Ajustar diferenças perceptíveis**
 
 Para qualquer diferença de cor/espaçamento/tipografia encontrada, editar o componente correspondente (Tasks 14–28) diretamente — não é uma task nova, é fechamento das mesmas. Reexecutar Step 2 até bater.
 
-- [ ] **Step 4: Confirmar Carousel funcional**
+- [x] **Step 4: Confirmar Carousel funcional**
 
 Usar `browser_click` nas setas prev/next da agenda e `browser_snapshot` pra confirmar que o carrossel scrolla (Embla).
 
-- [ ] **Step 5: Registrar resultado**
+- [x] **Step 5: Registrar resultado**
 
 Nenhum commit de código nesta task, a menos que Step 3 tenha gerado ajustes — nesse caso, commitar normalmente:
 ```bash
@@ -2286,7 +2286,7 @@ git commit -m "fix: adjust visual fidelity issues found in desktop verification"
 
 **Files:** nenhum arquivo de código (verificação manual assistida por Playwright), salvo ajustes.
 
-- [ ] **Step 1: Playwright em viewport mobile (390×844)**
+- [x] **Step 1: Playwright em viewport mobile (390×844)**
 
 `browser_resize` para `390x844`, navegar pela home, comparar com:
 - `design/screenshots/mobile/Screenshot 2026-07-18 at 22.04.42.png` (hero)
@@ -2294,19 +2294,19 @@ git commit -m "fix: adjust visual fidelity issues found in desktop verification"
 - `design/screenshots/mobile/Screenshot 2026-07-18 at 22.05.13.png` (pilares + agenda)
 - `design/screenshots/mobile/Screenshot 2026-07-18 at 22.07.17.png` (rodapé)
 
-- [ ] **Step 2: Testar o menu mobile (Sheet)**
+- [x] **Step 2: Testar o menu mobile (Sheet)**
 
 `browser_click` no botão de hambúrguer, `browser_snapshot` pra confirmar que o `Sheet` abre com os 6 itens + CTA, `browser_click` num item e confirmar que fecha e rola até a âncora.
 
-- [ ] **Step 3: Testar o breakpoint 860px**
+- [x] **Step 3: Testar o breakpoint 860px**
 
 `browser_resize` para `859x900` (nav deve estar em modo hambúrguer) e depois `861x900` (nav deve estar em modo desktop) — confirmar a troca exatamente no breakpoint documentado no CLAUDE.md §5.
 
-- [ ] **Step 4: Verificação manual do Pix (nota do Task 8)**
+- [x] **Step 4: Verificação manual do Pix (nota do Task 8)**
 
 Com o servidor rodando na rede local (`bun run dev --hostname 0.0.0.0`), abrir a seção Ofertas num celular real e escanear o QR com um app bancário — confirmar que ele reconhece a chave/nome/cidade cadastrados no seed. Testar também o botão "Copiar" (deve colar a chave Pix exata na área de transferência).
 
-- [ ] **Step 5: Ajustar diferenças perceptíveis e commitar se houve mudança**
+- [x] **Step 5: Ajustar diferenças perceptíveis e commitar se houve mudança**
 
 ```bash
 git add -A
@@ -2319,31 +2319,31 @@ git commit -m "fix: adjust visual fidelity issues found in mobile/breakpoint ver
 
 **Files:** nenhum novo (só verificação).
 
-- [ ] **Step 1: Lint**
+- [x] **Step 1: Lint**
 
 Run: `bunx oxlint`
 Expected: 0 erros.
 
-- [ ] **Step 2: Typecheck**
+- [x] **Step 2: Typecheck**
 
 Run: `bunx tsc --noEmit`
 Expected: 0 erros.
 
-- [ ] **Step 3: Testes**
+- [x] **Step 3: Testes**
 
 Run: `bun test`
 Expected: todos os testes de `lib/format/*.test.ts`, `lib/pix/*.test.ts` e `lib/dal.test.ts` (Fase 0) passam.
 
-- [ ] **Step 4: Build de produção**
+- [x] **Step 4: Build de produção**
 
 Run: `bun run build`
 Expected: build conclui sem erro, `/` aparece como rota estática/dinâmica esperada no output do Next.
 
-- [ ] **Step 5: Corrigir qualquer falha encontrada**
+- [x] **Step 5: Corrigir qualquer falha encontrada**
 
 Se lint/typecheck/teste falhar, voltar à task correspondente, corrigir, e commitar a correção isoladamente (não misturar com a próxima task).
 
-- [ ] **Step 6: Commit final (se algo mudou neste gate)**
+- [x] **Step 6: Commit final (se algo mudou neste gate)**
 
 ```bash
 git add -A
