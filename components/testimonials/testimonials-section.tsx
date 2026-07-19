@@ -5,8 +5,8 @@ export function TestimonialsSection({ testimonials }: { testimonials: Testimonia
   return (
     <section id="depoimentos" className="bg-popover">
       <div className="divider-glow" />
-      <div className="py-[88px]">
-        <div className="mx-auto max-w-6xl px-6 text-center">
+      <div className="mx-auto max-w-6xl px-6 py-[88px]">
+        <div className="text-center">
           <p className="text-xs font-bold tracking-[1.3px] text-blue-accent-text uppercase">
             Depoimentos
           </p>
