@@ -101,7 +101,7 @@
 
   --panel-gradient: linear-gradient(180deg, #1D222D 0%, #232937 100%);
   --card-gradient: linear-gradient(160deg, #252B38 0%, #2D3444 100%);
-  --divider-glow: linear-gradient(90deg, transparent, rgba(76, 140, 255, .4) 12%, rgba(76, 140, 255, .4) 88%, transparent);
+  --divider-glow: rgba(76, 140, 255, .4);
 }
 
 .dark {
