@@ -25,7 +25,7 @@ export function HeroSection({ profile }: { profile: PastorProfile }) {
         <h1 className="max-w-2xl font-heading text-[clamp(36px,5vw,58px)] leading-[1.1] font-semibold text-foreground">
           {profile.heroHeadline}
         </h1>
-        <p className="max-w-2xl font-caveat text-[1.25em] leading-[1.25em] text-primary">
+        <p className="max-w-2xl font-caveat text-[clamp(45px,6.25vw,72.5px)] leading-[1.25em] text-primary">
           {profile.heroHighlight}
         </p>
 
