@@ -39,14 +39,22 @@ Versões lidas de `package.json` / `bun.lock` / `node_modules` neste repositóri
 
 ```
 app/
-  (public)/            # página única "/", seções como componentes de app/(public)/_sections
+  page.tsx              # home pública "/", compõe as seções de components/<domínio>/
   admin/                # rotas protegidas: login, dashboard, CRUD por seção
   layout.tsx            # fontes via next/font, <html class="dark">
 components/
   ui/                   # shadcn — gerado via `bunx shadcn@latest add`, não editar à mão além de ajustes de tema
-  (demais pastas por domínio, ex.: agenda/, ofertas/, admin/)
+  navbar/, about/, agenda/, video/, books/, testimonials/, offerings/, footer/, admin/
+                        # 1 pasta por domínio (decisão da Fase 1: substitui o app/(public)/_sections/
+                        # planejado na Fase 0, nunca chegou a ser usado — alinha com o inventário de
+                        # componentes do §5, que já organiza por domínio)
 lib/
   prisma.ts             # client Prisma singleton (server-only), com driver adapter @prisma/adapter-pg
+  content/              # 1 arquivo por entidade (about.ts, agenda.ts, books.ts, video.ts,
+                        # testimonials.ts, offerings.ts, footer.ts) — Prisma + unstable_cache + tag
+  pix/                  # crc16.ts + br-code.ts — payload BR Code/EMV do Pix, função pura testada
+  format/                # date.ts (visibilidade/ordenação de agenda), price.ts (R$) — funções puras testadas
+  icons/                 # pillar-icons.tsx — mapa slug→ícone lucide dos cartões de "Sobre"
   supabase/              # server.ts (createServerClient p/ RSC/Actions); client.ts, admin.ts a criar quando precisar
   dal.ts                 # SÓ decisões puras de autorização (resolveAdminAccess, canRemoveAdmin) — zero import, testável sem runtime
   require-admin.ts       # requireAdmin() — wrapper de I/O (Supabase + Prisma) que usa lib/dal.ts; NÃO junte de volta no mesmo arquivo (ver §7)
@@ -150,7 +158,7 @@ Além da tabela do shadcn, manter os tokens **brutos** do protótipo disponívei
 | Bloco de Vídeo | custom (sem primitivo) + `Button` | thumb com overlay de play + duração |
 | Card de Depoimento | `Card` + `Avatar` (fallback com iniciais) | |
 | Bloco de Ofertas (Pix / conta nacional / internacional) | 3× `Card` + `Button` ("Copiar") + `Separator` entre pares label/valor | QR gerado client-side (§7 do PRD), nunca armazenado como imagem |
-| Rodapé | custom + ícones | ícones sociais do protótipo são SVGs desenhados à mão (Instagram/YouTube/WhatsApp) — **desvio justificado**: trocar por `lucide-react` (`Instagram`, `Youtube`, `MessageCircle`), já que é a `iconLibrary` configurada em `components.json`; manter tamanho 40×40px circular e hover azul |
+| Rodapé | custom + ícones | ícones sociais do protótipo são SVGs desenhados à mão (Instagram/YouTube/WhatsApp) — **desvio justificado**: usar `lucide-react` (`MessageCircle` para WhatsApp), já que é a `iconLibrary` configurada em `components.json`; manter tamanho 40×40px circular e hover azul. **Atualização Fase 1**: `lucide-react` 1.25 removeu todos os ícones de marca/logo (confirmado empiricamente — não há `Instagram`, `Youtube`, `Twitter`, `Facebook` etc. nos exports do pacote instalado, só `MessageCircle` sobreviveu por ser um ícone genérico), então Instagram e YouTube voltam a ser SVGs inline em `components/footer/footer.tsx` (glifo genérico câmera-em-moldura / retângulo-com-play, não o logotipo exato) — não é possível seguir a diretriz original de "tudo via lucide" para esses dois. |
 
 Regra geral: **reproduzir o protótipo fielmente** (paleta, tipografia, espaçamento, layout, responsividade). O HTML standalone é meta visual, não é para colar verbatim — ele usa uma sintaxe de template proprietária (`sc-for`, `sc-camel-on-click`, `x-import`) que não existe em Next/React; a estrutura de código segue App Router + Server Components + shadcn. Qualquer desvio do visual do protótipo (como os dois acima) precisa da mesma justificativa explícita registrada aqui — não é permitido "melhorar" o design sem essa nota.
 
