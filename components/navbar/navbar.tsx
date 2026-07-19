@@ -34,7 +34,7 @@ export function Navbar() {
         </nav>
 
         <div className="hidden nav:block">
-          <Button render={<a href="#agenda" />} className="rounded-full">
+          <Button render={<a href="#agenda" />} nativeButton={false} className="rounded-full">
             Fale Conosco
           </Button>
         </div>

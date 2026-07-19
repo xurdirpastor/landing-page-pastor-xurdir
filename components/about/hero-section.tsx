@@ -34,11 +34,12 @@ export function HeroSection({ profile }: { profile: PastorProfile }) {
         </p>
 
         <div className="mt-8 flex flex-wrap gap-4">
-          <Button render={<a href="#video" />} className="rounded-full">
+          <Button render={<a href="#video" />} nativeButton={false} className="rounded-full">
             Assista à última pregação
           </Button>
           <Button
             render={<a href="#agenda" />}
+            nativeButton={false}
             variant="outline"
             className="rounded-full border-border-strong"
           >

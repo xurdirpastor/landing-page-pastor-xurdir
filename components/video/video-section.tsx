@@ -42,6 +42,7 @@ export function VideoSection({ video }: { video: VideoHighlight }) {
           </p>
           <Button
             render={<a href={video.videoUrl} target="_blank" rel="noopener noreferrer" />}
+            nativeButton={false}
             className="mt-6 rounded-full"
           >
             {video.ctaLabel}
