@@ -1,0 +1,160 @@
+# PRD — Seja Livre
+
+Landing page + área administrativa do Ministério Seja Livre (Pastor Xurdir). Este documento define o que construir e por quê; o "como" (stack, arquitetura, convenções) está em [`CLAUDE.md`](./CLAUDE.md). Fonte de verdade visual: `design/design-system-landing-page-pastor.pdf` (tokens) e `design/landing-pastor-standalone.html` (layout/referência).
+
+## 1. Visão geral, problema e objetivo
+
+O Pastor Xurdir e o Ministério Seja Livre não têm hoje uma presença digital própria que apresente o ministério, divulgue a agenda de cultos/mentorias/pregações, venda livros, compartilhe depoimentos e receba dízimos/ofertas de forma organizada. O conteúdo (fotos, textos, datas) muda com frequência (nova agenda toda semana, novos depoimentos, eventuais novos livros) e hoje depende de quem sabe mexer em código para atualizar qualquer coisa.
+
+**Objetivo do MVP**: publicar uma landing page pública fiel ao protótipo do Claude Design, rápida e bem indexada por buscadores, e dar a ~3 administradores um painel simples para manter o conteúdo dessas seções atualizado sem depender de deploy.
+
+## 2. Personas
+
+- **Pastor Xurdir / administradores (~3 pessoas)**: alimentam agenda, livros, depoimentos, dados de oferta e texto/fotos do "Sobre". Não são desenvolvedores — precisam de formulários simples, sem construtor visual, com feedback claro de sucesso/erro.
+- **Visitante/fiel**: acessa o site pelo celular (majoritariamente) ou desktop para conhecer o ministério, ver a próxima data de culto/mentoria, comprar um livro, assistir à última pregação, ler depoimentos ou fazer uma doação/dízimo via Pix ou transferência (inclusive do exterior).
+- **Aluno (futuro, v2)**: papel já reservado no modelo de dados (`role = student`), sem nenhuma funcionalidade no MVP — existirá quando a área do aluno (cursos/mentorias pagas) for construída.
+
+## 3. Escopo: MVP vs. v2
+
+| Item | MVP | v2 |
+|---|---|---|
+| Landing page pública (Sobre, Agenda, Livros, Vídeo, Depoimentos, Ofertas, Rodapé) | ✅ | — |
+| Admin com CRUD de conteúdo dessas seções (~3 admins, RBAC simples) | ✅ | — |
+| Construtor visual de seções (drag-n-drop) | ❌ | ✅ |
+| Pix/bancário: só exibição (chave estática + QR client-side + dados bancários) | ✅ | — |
+| Pagamento via gateway (AbacatePay): inscrição em cursos/mentorias, compra de livro, cobrança recorrente Pix/cartão | ❌ | ✅ |
+| Área do aluno (cursos, aulas) | ❌ | ✅ |
+| Lembretes de lives/aulas | ❌ | ✅ |
+| Papel `student` | reservado no schema, sem uso | ✅ funcional |
+
+## 4. Requisitos funcionais por seção
+
+Navegação pública, nesta ordem (idêntica ao protótipo): **Sobre · Agenda · Livros · Depoimentos · Ofertas**, com CTA fixo "Fale Conosco" no header (aponta para `#agenda`, igual ao protótipo — reproduzir esse comportamento; qualquer destino diferente, como WhatsApp, é uma mudança de escopo a aprovar explicitamente, não uma correção "óbvia").
+
+### 4.1 Apresentação / Sobre (`#sobre`)
+- FR-1: Exibir foto de destaque do pastor (hero, seção `#hero`) com headline em duas linhas — 1ª linha em Source Serif 4, 2ª linha manuscrita (Caveat, cor laranja) — e texto de apresentação mencionando a esposa e os filhos.
+- FR-2: Exibir foto da família (`#hero-familia`) e um bloco de texto "Uma missão, três frentes" com 3 cartões (ícone + título + descrição curta): Palavra viva, Libertação e cura interior, Formação de líderes.
+- FR-3: Todo texto e todas as fotos desta seção (headline, texto de apresentação, foto do pastor, foto da família, os 3 cartões) devem ser editáveis pelo admin — nada hardcoded no código após o MVP estar no ar.
+
+### 4.2 Agenda (`#agenda`)
+- FR-4: Listar itens de agenda (culto presencial, mentoria, pregação) como cards: foto, selo **Presencial** (laranja sólido) ou **Online** (escuro translúcido), título, data (texto livre exibido + data real para ordenação), local, link "Saiba mais →".
+- FR-5: Cards em carrossel horizontal com setas prev/next (ver mapeamento shadcn `Carousel` no `CLAUDE.md`); card com largura fixa (~340px) e gap de 24px, igual ao protótipo.
+- FR-6: Admin cria/edita/remove itens de agenda, define tipo (Presencial/Online), define ordem de exibição, publica/despublica um item sem apagá-lo.
+- FR-7: Itens despublicados **ou com `date` já passada** não aparecem na seção pública — a expiração por data é automática (o admin não precisa lembrar de despublicar um evento que já aconteceu).
+
+### 4.3 Livros (`#livros`)
+- FR-8: Exibir cada livro publicado como card em destaque: capa, título, subtítulo, descrição, preço (formatado em `R$`), botão "Comprar agora" (link externo).
+- FR-9: Admin cria/edita/remove livros (capa, título, subtítulo, descrição, preço, link de compra), define ordem, publica/despublica.
+- FR-10: No lançamento, a seção exibe **1 livro** (igual ao protótipo). O modelo de dados já é uma lista ordenável (`order`, `isPublished`), então adicionar um 2º livro no futuro é só um novo registro no admin — não exige mudança de schema, só eventual ajuste de layout (grid) se a lista crescer.
+
+### 4.4 Vídeo em destaque (`#video`)
+- FR-11: Exibir um bloco de vídeo em destaque: thumbnail com overlay de "play" e duração, rótulo (eyebrow), título, descrição curta, botão "Assistir agora" (link externo, ex.: YouTube).
+- FR-12: Admin edita o vídeo em destaque atual (thumbnail, título, descrição, link, rótulo, duração). MVP: um vídeo em destaque por vez (não é uma lista/histórico de vídeos).
+
+### 4.5 Depoimentos / "Vidas transformadas" (`#depoimentos`)
+- FR-13: Exibir depoimentos em grid responsivo de cards: citação, avatar circular com iniciais, nome, papel/vínculo ("Membro desde 2021" etc.).
+- FR-14: Admin cria/edita/remove depoimentos, define ordem, publica/despublica.
+
+### 4.6 Dízimos e ofertas (`#ofertas`)
+- FR-15: Exibir 3 cartões lado a lado: (a) Pix — QR Code + chave copia-e-cola com botão "Copiar"; (b) Conta nacional — Banco, Agência, Conta corrente, CNPJ; (c) Conta internacional — Banco, IBAN, SWIFT/BIC, Titular.
+- FR-16: O QR Code Pix é **gerado no cliente** a partir dos dados cadastrados (chave, nome do beneficiário, cidade) montando o payload BR Code (EMV) — nunca é uma imagem estática enviada pelo admin nem armazenada no banco/Storage.
+- FR-17: Botão "Copiar" copia a chave Pix (texto copia-e-cola) para a área de transferência e dá feedback visual de sucesso.
+- FR-18: Admin edita, num único formulário de configuração ("Ofertas"), todos os campos usados nos 3 cartões (chave Pix + dados da conta nacional + dados da conta internacional). Não há histórico/versionamento no MVP — é um registro singleton.
+
+### 4.7 Rodapé
+- FR-19: Exibir logo + nome do ministério, CNPJ, endereço, links de navegação (Sobre/Agenda/Livros/Ofertas), 3 ícones de redes sociais (Instagram, YouTube, WhatsApp) e linha de copyright.
+- FR-20: Admin edita CNPJ, endereço, os 3 links de redes sociais e o texto de copyright.
+
+### 4.8 Área admin (`/admin`)
+- FR-21: Login restrito (Supabase Auth) — só usuários com registro na tabela `Admin` (papel `admin`) acessam qualquer rota de `/admin`.
+- FR-22: CRUD de conteúdo para cada seção acima (Sobre, Agenda, Livros, Vídeo, Depoimentos, Ofertas, Rodapé) — sem construtor visual, sem editor de layout, só formulários por seção.
+- FR-23: Upload de imagens direto para Supabase Storage a partir do formulário do admin (sem passo manual de subir arquivo em outro lugar e colar URL).
+- FR-24: Ao salvar qualquer conteúdo, a página pública correspondente é revalidada sob demanda (o visitante vê a mudança sem esperar rebuild/deploy).
+- FR-25: RBAC simples: todo admin cadastrado tem acesso total ao CRUD de conteúdo (não há, no MVP, permissões granulares por seção entre os 3 admins).
+- FR-26: Qualquer admin logado pode cadastrar um novo admin (e-mail + nome) e remover um admin existente pelo próprio painel — exceto o admin marcado `isSuperAdmin`, cuja remoção é sempre bloqueada (erro explícito, não falha silenciosa). Não há tela de gestão de admin fora do painel (sem depender do dashboard do Supabase para isso).
+
+## 5. Design & UI
+
+**O protótipo do Claude Design é a fonte de verdade visual** — qualquer dúvida de cor, espaçamento, tipografia ou componente se resolve olhando `design/design-system-landing-page-pastor.pdf` e `design/landing-pastor-standalone.html`, nunca por estimativa.
+
+- **Paleta**: grafite (`#161A22` base, `#1D222D`/`#252B38`/`#2D3444` painéis e cards) + azul de marca/links (`#3159C7` a `#8FB4FF`) + **laranja `#FF7A3D`** como única cor de ação (CTAs, selo "Presencial"). Tema escuro único, sem alternância para claro.
+- **Tipografia**: Source Serif 4 (títulos), Manrope (corpo/UI), Caveat (destaque manuscrito), todas carregadas via `next/font/google`.
+- **Design tokens completos** (cores, gradientes, radius, sombras, escala tipográfica e de espaçamento): ver tabela consolidada em `CLAUDE.md` §5 — não duplicado aqui para evitar os dois documentos divergirem.
+- **Breakpoints**: o protótipo é fluido (grids `auto-fit/minmax`) com um único ponto de quebra funcional, **860px**, onde a navbar troca de menu inline para hambúrguer/`Sheet`. Não há outros breakpoints fixos a reproduzir — o layout deve se comportar bem em qualquer largura entre mobile e desktop, não só em pontos específicos.
+- **Inventário de componentes** (visual → shadcn): navbar + menu mobile, hero, cards de "Sobre" (ícone+título+texto), carrossel de agenda (card + selo), card de livro, bloco de vídeo, card de depoimento (+ avatar), bloco de ofertas (3 cards + botão copiar), selos Presencial/Online, rodapé (logo, links, ícones sociais), botões primário/secundário — mapeamento detalhado para primitivos shadcn (`Button`, `Card`, `Badge`, `Sheet`, `Avatar`, `Carousel`, `Separator`) em `CLAUDE.md` §5, incluindo os dois desvios justificados (uso de `Carousel` do shadcn em vez do scroll manual do protótipo; ícones sociais via `lucide-react` em vez dos SVGs desenhados à mão).
+- **Acessibilidade**: o próprio protótipo já foi calibrado para contraste AA em tema escuro (`--text-primary` ~13:1, `--text-secondary` ~8:1, `--text-muted` ~4.6:1 sobre `--bg`) — não é permitido "escurecer" ou "clarear" essas cores por preferência estética sem checar contraste de novo. Além disso: toda imagem com `alt` descritivo, navegação por teclado no menu mobile (`Sheet`) e no carrossel de agenda, foco visível usando o `--ring` do design system, formulários do admin com `label` associado a cada campo.
+
+## 6. Modelo de dados (entidades e campos)
+
+> Nomes em inglês (convenção do projeto); tipos indicativos para o Prisma schema, a refinar na fase de planejamento.
+
+- **Admin**: `id` (uuid, PK própria — **não** é mais igual ao `auth.users.id` desde o início, ver nota abaixo), `email` (único, chave de negócio), `supabaseUserId` (nullable, preenchido no primeiro login via magic link), `name`, `role` (`admin` | `student`, default `admin` — `student` reservado, sem uso no MVP), `isSuperAdmin` (boolean, default `false` — exatamente 1 linha nasce `true`, via seed, e nunca pode ser removida), `createdAt`.
+  > Diferente do desenho original: como o login é por **magic link** e um admin é cadastrado pelo e-mail antes de existir qualquer usuário no Supabase Auth, `Admin.id` não pode nascer igual ao `auth.users.id` (que só existe depois do primeiro acesso). `supabaseUserId` é preenchido nesse momento — até lá, o registro existe só com `email`.
+- **PastorProfile** (singleton): `heroPhotoUrl`, `heroHeadline` (1ª linha), `heroHighlight` (2ª linha manuscrita), `heroIntro` (texto), `familyPhotoUrl`, `aboutEyebrow`, `aboutHeading`, `aboutIntro`.
+- **AboutPillar**: `id`, `icon` (slug do ícone), `title`, `description`, `order`.
+- **AgendaItem**: `id`, `title`, `type` (`presencial` | `online`), `date` (DateTime, para ordenação/expiração), `dateLabel` (texto exibido, ex.: "Qui, 17 de julho · 19h30"), `location`, `imageUrl`, `linkUrl`, `order`, `isPublished`, `createdAt`, `updatedAt`.
+- **Book**: `id`, `title`, `subtitle`, `description`, `price` (Decimal), `coverImageUrl`, `buyUrl`, `order`, `isPublished`.
+- **VideoHighlight** (singleton): `eyebrow`, `title`, `description`, `thumbnailUrl`, `videoUrl`, `durationLabel`, `ctaLabel`.
+- **Testimonial**: `id`, `quote`, `name`, `role`, `initials`, `avatarColor`, `order`, `isPublished`.
+- **OfferingSettings** (singleton): `pixKey`, `pixKeyType` (`email`|`cpf`|`cnpj`|`phone`|`random`), `pixMerchantName`, `pixMerchantCity`, `nationalBank`, `nationalAgency`, `nationalAccount`, `nationalCnpj`, `intlBank`, `intlIban`, `intlSwift`, `intlAccountHolder`.
+- **FooterSettings** (singleton): `cnpj`, `address`, `instagramUrl`, `youtubeUrl`, `whatsappUrl`, `copyrightText`.
+
+Singletons (`PastorProfile`, `VideoHighlight`, `OfferingSettings`, `FooterSettings`) modelados como tabela de 1 linha fixa — mais simples de editar num formulário único do que uma tabela genérica de "settings" chave-valor, e suficiente para ~3 admins sem necessidade de histórico de versões no MVP.
+
+## 7. Requisitos não funcionais
+
+- **SEO/ISR**: páginas públicas renderizadas no servidor (Server Components), com `metadata` (title/description/OpenGraph) apropriado por seção-âncora quando fizer sentido, `next/image` para todas as imagens, e revalidação sob demanda (não polling) ao salvar no admin — ver arquitetura de cache em `CLAUDE.md` §3.
+- **Performance**: imagens otimizadas via `next/image` a partir do Supabase Storage; fontes via `next/font` (sem layout shift de fonte); carrossel de agenda não deve bloquear o carregamento inicial da página.
+- **Acessibilidade**: contraste AA no tema escuro (ver §5), navegação por teclado, `alt` em imagens, foco visível.
+- **Segurança/authz**: autorização decidida na aplicação (Server Actions/Route Handlers), não em RLS — modelo completo em `CLAUDE.md` §7. Nenhuma rota de mutação de conteúdo aceita requisição sem sessão de admin válida revalidada no servidor.
+- **Responsividade**: mobile-first, fluida, com o único breakpoint funcional em 860px (troca de navbar) — ver §5.
+- **i18n**: todo conteúdo do site e do admin em pt-BR; identificadores de código, nomes de tabela/coluna, commits e comandos em inglês.
+
+## 8. Pagamentos
+
+- **MVP**: só exibição de dados de doação — QR Pix gerado no cliente a partir do payload BR Code (chave + nome + cidade cadastrados em `OfferingSettings`), chave copia-e-cola, e dados bancários nacionais/internacionais. Nenhuma integração de gateway, nenhuma cobrança processada pelo site.
+- **v2 (fora de escopo agora)**: AbacatePay para inscrição paga em cursos/mentorias, compra de livro com checkout, e cobrança recorrente via Pix/cartão. Não desenhar schema nem UI para isso agora — só citar como direção futura.
+
+## 9. Área admin
+
+- RBAC simples: papel único `admin` com acesso total ao CRUD de conteúdo das seções listadas em §4; ~3 pessoas usarão o painel. `student` existe só como valor reservado do enum de papel, sem tela nem permissão associada no MVP.
+- Autenticação via Supabase Auth com **magic link** (sem senha) — o e-mail é a chave: um e-mail só entra se já existir uma linha correspondente na tabela `Admin`. O usuário do Supabase Auth é criado automaticamente no primeiro acesso (não precisa de convite manual pelo dashboard).
+- Exatamente um admin nasce como **superAdmin** (via seed, FR-26) — só ele não pode ser removido. Qualquer admin logado pode cadastrar (por e-mail) ou remover outro admin comum pelo próprio painel; remover o superAdmin é bloqueado explicitamente. Isso é a única distinção de permissão entre admins — fora isso, todos têm acesso total ao CRUD de conteúdo (FR-25 continua valendo).
+- Sem construtor visual, sem editor de blocos livres: cada seção tem seu próprio formulário com os campos definidos em §6.
+- Toda alteração salva dispara revalidação sob demanda da página pública (FR-24).
+
+## 10. Roadmap / milestones
+
+- **Fase 0 — Fundação**: instalar Prisma (hoje ausente, só há placeholders de schema/config), configurar Supabase (projeto, Storage bucket, Auth), schema Prisma completo (§6), migrations iniciais, `proxy.ts` + DAL de autorização, `globals.css` com os tokens mapeados (`CLAUDE.md` §5).
+- **Fase 1 — Landing pública (read-only, dados seed)**: implementar todas as seções públicas (§4.1–4.7) lendo de dados semeados manualmente no banco (sem admin ainda), com fidelidade visual completa ao protótipo.
+- **Fase 2 — Admin**: login, CRUD de cada seção (§4.8), upload de imagem para Storage, revalidação sob demanda ligada ao salvar.
+- **Fase 3 — Polimento e lançamento**: SEO (metadata, OpenGraph), acessibilidade, revisão de conteúdo real com o pastor/admins, checklist de `shipping-and-launch`.
+- **v2 (não iniciar agora)**: AbacatePay, construtor drag-n-drop, área do aluno, lembretes de lives/aulas.
+
+## 11. Fora de escopo (v2 e além)
+
+AbacatePay (inscrição em cursos/mentorias, compra de livros, cobrança recorrente Pix/cartão) · construtor de seções drag-n-drop (blocos de texto/imagem/carrossel livres) · área do aluno (cursos e aulas) · lembretes de lives e aulas · qualquer funcionalidade que dependa do papel `student`.
+
+## 12. Questões em aberto
+
+Decisões já tomadas nesta rodada (não são mais questões em aberto): itens de agenda expiram automaticamente por data (FR-7); 1 livro no lançamento (FR-10); login do admin por email+senha (§9); Cache Components do Next 16 permanece **desligado** no MVP (modelo clássico `unstable_cache`/`revalidateTag`, já documentado em `CLAUDE.md`).
+
+Ainda em aberto:
+
+1. **context7 indisponível nesta sessão de setup** (nenhum servidor MCP conectado) — versões e docs usadas aqui vêm de `package.json`/`bun.lock`/`node_modules/next/dist/docs`. Antes da Fase 0, rodar context7 para confirmar: conexão do pooler Supabase com Prisma, API atual de Storage/Auth do `@supabase/ssr`, e flags atuais do `shadcn` CLI.
+2. **Biblioteca de geração de QR Code no cliente** (FR-16) ainda não escolhida — candidatos levantados: `react-qr-code` (SVG, leve, ativamente mantida) ou `qrcode.react` (canvas/SVG, base de usuários maior, atualização menos recente). Falta escolher a lib do payload BR Code/EMV (CRC16) que gera a string por trás do QR — decidir e confirmar versões via context7 na fase de planejamento, não nesta etapa de spec.
+3. **Cor de erro/estado destrutivo** (`--destructive`): o protótipo não define uma cor de erro. Proposta (a validar com o time ao ver a tela real do admin): `#E5484D` (vermelho legível em fundo `#161A22`, mesma família de contraste dos demais tokens de texto) — documentado como proposta, não como token oficial do protótipo, em `CLAUDE.md` §5.
+
+## 13. Critérios de aceite por feature
+
+Cada critério abaixo deve virar teste automatizado (unitário/integração) ou passo de verificação manual explícito no plano do Superpowers.
+
+- **Sobre**: dado que o admin salvou headline/foto/3 pilares, a home exibe exatamente esse conteúdo (sem cache stale) e a comparação lado a lado com `design/landing-pastor-standalone.html#sobre` não mostra diferença perceptível de layout/tipografia/cor.
+- **Agenda**: cards renderizam selo correto por `type` (Presencial = laranja sólido, Online = escuro translúcido); item com `isPublished=false` não aparece na home; carrossel navega via setas prev/next e por swipe/touch; largura de card e gap batem com o protótipo (~340px / 24px).
+- **Livros**: card exibe preço formatado em `R$`; botão "Comprar agora" abre `buyUrl` em nova aba; livro despublicado some da home.
+- **Vídeo**: bloco exibe thumbnail, duração, título, descrição e CTA do `VideoHighlight` atual; editar no admin atualiza a home sem rebuild.
+- **Depoimentos**: grid responsivo reflui corretamente em mobile/desktop; avatar mostra iniciais quando não há foto; ordem respeita o campo `order`.
+- **Ofertas**: QR renderizado no cliente decodifica para um payload BR Code válido contendo a chave/nome/cidade cadastrados (teste automatizado do parser/gerador do payload); botão "Copiar" coloca a chave Pix na área de transferência; os 3 cards exibem exatamente os campos de `OfferingSettings`; nenhuma chamada de rede busca/serve uma "imagem de QR" — é gerado localmente.
+- **Rodapé**: CNPJ, endereço, links de navegação e ícones sociais refletem `FooterSettings`; os 3 ícones sociais linkam para as URLs cadastradas.
+- **Admin**: usuário sem registro em `Admin` é redirecionado ao tentar acessar qualquer rota `/admin/**`; toda Server Action de mutação re-verifica sessão + papel no servidor (não confia só no `proxy.ts`); salvar qualquer seção revalida a página pública correspondente em até uma requisição (sem precisar de F5 duplo/hard refresh); upload de imagem no admin resulta num arquivo no bucket do Supabase Storage e numa URL pública válida gravada no registro correspondente.
+- **Fidelidade visual (transversal a todas as features)**: para cada seção implementada, captura de tela do resultado comparada lado a lado com o frame equivalente em `design/screenshots/` (desktop e mobile) ou com `design/landing-pastor-standalone.html` aberto no navegador — cor, tipografia, espaçamento e breakpoint de 860px da navbar devem bater; qualquer diferença precisa ser um desvio justificado e documentado em `CLAUDE.md` §5, não uma inconsistência silenciosa.
