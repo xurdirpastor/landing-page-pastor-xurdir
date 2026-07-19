@@ -32,7 +32,7 @@ export function VideoSection({ video }: { video: VideoHighlight }) {
         </a>
 
         <div>
-          <p className="text-xs font-bold tracking-[1.3px] text-blue-accent-text uppercase">
+          <p className="text-sm font-bold tracking-[1.3px] text-blue-accent-text uppercase">
             {video.eyebrow}
           </p>
           <h2 className="mt-3 font-heading text-[clamp(32px,4.2vw,46px)] font-semibold text-foreground">

@@ -13,7 +13,7 @@ import type { Testimonial } from '@/lib/generated/prisma/client'
 
 export function TestimonialCarousel({ testimonials }: { testimonials: Testimonial[] }) {
   return (
-    <Carousel opts={{ align: 'start', containScroll: false }} className="mt-10">
+    <Carousel opts={{ align: 'start' }} className="mt-10">
       <CarouselContent className="-ml-6">
         {testimonials.map((testimonial) => (
           <CarouselItem key={testimonial.id} className="basis-auto pl-6">
