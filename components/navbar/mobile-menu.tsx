@@ -32,6 +32,7 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
             <SheetClose
               key={item.href}
               render={<a href={item.href} />}
+              nativeButton={false}
               className="rounded-md px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
             >
               {item.label}
@@ -41,6 +42,7 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
         <div className="mt-auto p-4">
           <SheetClose
             render={<a href="#agenda" />}
+            nativeButton={false}
             className={cn(buttonVariants(), 'w-full rounded-full')}
           >
             Fale Conosco
