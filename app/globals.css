@@ -45,6 +45,25 @@
   --radius-full: 999px;
 }
 
+@theme {
+  --breakpoint-nav: 860px;
+
+  --color-text-secondary: #B7BECD;
+  --color-blue-primary: #3159C7;
+  --color-blue-primary-dim: #293868;
+  --color-blue-accent: #4C8CFF;
+  --color-blue-accent-hover: #6A9FFF;
+  --color-blue-accent-text: #8FB4FF;
+  --color-bg-panel-2: #252B38;
+  --color-bg-panel-3: #2D3444;
+  --color-border-strong: rgba(255, 255, 255, 0.24);
+  --color-brand-accent: #FF7A3D;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, .35);
+  --shadow-md: 0 12px 32px rgba(0, 0, 0, .45);
+  --shadow-glow: 0 0 0 1px rgba(76, 140, 255, .3), 0 16px 48px rgba(30, 40, 70, .4);
+}
+
 :root {
   --background: #161A22;
   --foreground: #F5F6FA;
@@ -79,6 +98,10 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  --panel-gradient: linear-gradient(180deg, #1D222D 0%, #232937 100%);
+  --card-gradient: linear-gradient(160deg, #252B38 0%, #2D3444 100%);
+  --divider-glow: linear-gradient(90deg, transparent, rgba(76, 140, 255, .4), transparent);
 }
 
 .dark {
@@ -121,9 +144,27 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    background: radial-gradient(120% 90% at 50% 0%, #202737 0%, #161A22 48%);
+    @apply text-foreground;
   }
   html {
     @apply font-sans;
+  }
+  ::selection {
+    background: var(--primary);
+    color: #fff;
+  }
+}
+
+@layer utilities {
+  .bg-panel-gradient {
+    background: var(--panel-gradient);
+  }
+  .bg-card-gradient {
+    background: var(--card-gradient);
+  }
+  .divider-glow {
+    height: 1px;
+    background: var(--divider-glow);
   }
 }
