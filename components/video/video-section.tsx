@@ -1,12 +1,13 @@
 import Image from 'next/image'
-import { Play } from 'lucide-react'
+import { LuPlay } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 import type { VideoHighlight } from '@/lib/generated/prisma/client'
 
 export function VideoSection({ video }: { video: VideoHighlight }) {
   return (
-    <section id="video" className="bg-popover py-[88px]">
-      <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 nav:grid-cols-2">
+    <section id="video" className="bg-popover">
+      <div className="divider-glow" />
+      <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-[88px] nav:grid-cols-2">
         <a
           href={video.videoUrl}
           target="_blank"
@@ -22,7 +23,7 @@ export function VideoSection({ video }: { video: VideoHighlight }) {
           />
           <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/40">
             <span className="flex size-16 items-center justify-center rounded-full bg-white/90 text-background">
-              <Play className="size-6 fill-current" />
+              <LuPlay className="size-6 fill-current" />
             </span>
           </div>
           <span className="absolute right-4 bottom-4 rounded-md bg-background/80 px-2.5 py-1 text-xs font-semibold text-foreground">
@@ -34,7 +35,7 @@ export function VideoSection({ video }: { video: VideoHighlight }) {
           <p className="text-xs font-bold tracking-[1.3px] text-blue-accent-text uppercase">
             {video.eyebrow}
           </p>
-          <h2 className="mt-3 font-heading text-[clamp(28px,3.6vw,40px)] font-semibold text-foreground">
+          <h2 className="mt-3 font-heading text-[clamp(32px,4.2vw,46px)] font-semibold text-foreground">
             {video.title}
           </h2>
           <p className="mt-4 max-w-lg text-base leading-[1.7] text-text-secondary">

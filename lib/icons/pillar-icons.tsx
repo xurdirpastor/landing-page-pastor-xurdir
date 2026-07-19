@@ -1,11 +1,12 @@
-import { FileText, Clock, UserPlus, Sparkles, type LucideIcon } from 'lucide-react'
+import { LuFileText, LuClock, LuUserPlus, LuSparkles } from 'react-icons/lu'
+import type { IconType } from 'react-icons'
 
-const PILLAR_ICONS: Record<string, LucideIcon> = {
-  'file-text': FileText,
-  clock: Clock,
-  'user-plus': UserPlus,
+const PILLAR_ICONS: Record<string, IconType> = {
+  'file-text': LuFileText,
+  clock: LuClock,
+  'user-plus': LuUserPlus,
 }
 
-export function getPillarIcon(slug: string): LucideIcon {
-  return PILLAR_ICONS[slug] ?? Sparkles
+export function getPillarIcon(slug: string): IconType {
+  return PILLAR_ICONS[slug] ?? LuSparkles
 }

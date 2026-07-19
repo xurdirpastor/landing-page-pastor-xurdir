@@ -17,12 +17,14 @@ Versões lidas de `package.json` / `bun.lock` / `node_modules` neste repositóri
 | UI | React / react-dom | 19.2.4 |
 | Linguagem | TypeScript | ^5 |
 | Estilo | Tailwind CSS | 4.3.3 (CSS-first, `@theme` em `globals.css`) |
-| Componentes | shadcn CLI | 4.13.1 (style `base-nova`, `cssVariables: true`, `iconLibrary: lucide`) |
-| Ícones | lucide-react | ^1.25.0 |
+| Componentes | shadcn CLI | 4.13.1 (style `base-nova`, `cssVariables: true`, `iconLibrary: lucide` — ver nota abaixo) |
+| Ícones | react-icons | ^5.7.0 (`react-icons/lu` para tudo, `react-icons/fa` só para os 3 ícones de marca do rodapé — ver §5) |
 | Auth/DB/Storage | @supabase/ssr | 0.12.3 |
 | Auth/DB/Storage | @supabase/supabase-js | 2.110.7 |
 | Lint | oxlint | 1.74.0 |
 | ORM | Prisma | **ainda não instalado** — só existe `prisma/schema.prisma` e `prisma.config.ts` placeholders. Primeira tarefa de implementação deve rodar `bun add -d prisma` + `bun add @prisma/client` e confirmar a versão via context7 antes de escrever schema real. |
+
+> **Ícones: `react-icons`, não `lucide-react`.** `components.json` ainda declara `iconLibrary: lucide` porque é a única opção do schema do shadcn CLI 4.13.1 (`lucide | hugeicons | tabler | phosphor | remixicon` — `react-icons` não é um valor válido ali, esse campo só afeta o que o CLI importaria ao gerar um bloco novo com ícone). Na prática, `lucide-react` foi removido do projeto (Fase 1): usar `react-icons/lu` (o próprio Lucide portado pra dentro do react-icons, mesmos nomes com prefixo `Lu`, mesmo visual) para tudo — inclusive dentro dos arquivos gerados pelo shadcn (`components/ui/carousel.tsx`, `components/ui/sheet.tsx`) — e `react-icons/fa` só para os 3 ícones de marca do rodapé (`FaInstagram`, `FaYoutube`, `FaWhatsapp`), que não existem em nenhuma variante do Lucide. Se um futuro `bunx shadcn add` gerar um import de `lucide-react`, trocar manualmente para `react-icons/lu` antes de commitar.
 
 > **Não é o Next.js que você conhece.** Next 16 renomeou `middleware.ts` para **`proxy.ts`** (mesma função, novo nome/arquivo — confirmado em `node_modules/next/dist/docs/01-app/01-getting-started/16-proxy.md`) e introduziu **Cache Components** (`cacheComponents` flag em `next.config.ts`, hoje **desligada** neste projeto — `next.config.ts` está no default). Com a flag desligada, valem as regras de cache "modelo anterior" (`fetch({cache})`, `unstable_cache`, `export const revalidate`), não as diretivas `use cache`/`cacheLife`. Não assuma nada de memória — releia `node_modules/next/dist/docs/` antes de mexer em roteamento, cache ou proxy.
 

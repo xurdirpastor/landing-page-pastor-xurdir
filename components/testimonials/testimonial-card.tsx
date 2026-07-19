@@ -4,7 +4,7 @@ import type { Testimonial } from '@/lib/generated/prisma/client'
 
 export function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
   return (
-    <Card className="bg-card-gradient p-6">
+    <Card className="w-[360px] shrink-0 bg-card-gradient p-6">
       <p className="text-sm leading-[1.65] text-text-secondary">&ldquo;{testimonial.quote}&rdquo;</p>
       <div className="mt-5 flex items-center gap-3">
         <Avatar>

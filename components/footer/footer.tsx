@@ -11,6 +11,7 @@ const NAV_LINKS = [
 export function Footer({ settings }: { settings: FooterSettings }) {
   return (
     <footer className="bg-popover">
+      <div className="divider-glow" />
       <div className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-10 nav:grid-cols-3">
           <div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { Menu } from 'lucide-react'
+import { LuMenu } from 'react-icons/lu'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import {
@@ -20,7 +20,7 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
       <SheetTrigger
         className={cn(buttonVariants({ variant: 'outline', size: 'icon' }), 'nav:hidden')}
       >
-        <Menu className="size-5" />
+        <LuMenu className="size-5" />
         <span className="sr-only">Abrir menu</span>
       </SheetTrigger>
       <SheetContent side="right">

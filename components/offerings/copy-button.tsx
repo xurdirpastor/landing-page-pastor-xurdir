@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, Copy } from 'lucide-react'
+import { LuCheck, LuCopy } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 
 export function CopyButton({ value }: { value: string }) {
@@ -15,7 +15,7 @@ export function CopyButton({ value }: { value: string }) {
 
   return (
     <Button onClick={handleCopy} size="sm" className="rounded-full">
-      {copied ? <Check className="size-4" /> : <Copy className="size-4" />}
+      {copied ? <LuCheck className="size-4" /> : <LuCopy className="size-4" />}
       {copied ? 'Copiado' : 'Copiar'}
     </Button>
   )
