@@ -125,10 +125,10 @@ Singletons (`PastorProfile`, `VideoHighlight`, `OfferingSettings`, `FooterSettin
 
 ## 10. Roadmap / milestones
 
-- **Fase 0 — Fundação**: instalar Prisma (hoje ausente, só há placeholders de schema/config), configurar Supabase (projeto, Storage bucket, Auth), schema Prisma completo (§6), migrations iniciais, `proxy.ts` + DAL de autorização, `globals.css` com os tokens mapeados (`CLAUDE.md` §5).
-- **Fase 1 — Landing pública (read-only, dados seed)**: implementar todas as seções públicas (§4.1–4.7) lendo de dados semeados manualmente no banco (sem admin ainda), com fidelidade visual completa ao protótipo.
-- **Fase 2 — Admin**: login, CRUD de cada seção (§4.8), upload de imagem para Storage, revalidação sob demanda ligada ao salvar.
-- **Fase 3 — Polimento e lançamento**: SEO (metadata, OpenGraph), acessibilidade, revisão de conteúdo real com o pastor/admins, checklist de `shipping-and-launch`.
+- **Fase 0 — Fundação — ✅ CONCLUÍDA (2026-07-19)**: Prisma 7.8.0 instalado e configurado (schema completo, §6, com driver adapter `@prisma/adapter-pg` — Prisma 7 exige isso, ver `CLAUDE.md` §8), Supabase real conectado (projeto `landing-page-xurdir`, migrations aplicadas, RLS ligado nas 10 tabelas, bucket `media` com policies), login por magic link + `requireAdmin()`/`proxy.ts` (`CLAUDE.md` §7), seed com superAdmin + conteúdo placeholder, tokens do protótipo em `globals.css` + fontes no `layout.tsx` (verificado num browser real, não só build). Spec em `docs/superpowers/specs/2026-07-18-fase-0-fundacao-design.md`, plano executado (todas as tasks) em `docs/superpowers/plans/2026-07-18-fase-0-fundacao.md`. 3 advisories de segurança do Supabase ficaram registrados para decisão futura — ver §12.
+- **Fase 1 — Landing pública (read-only, dados seed)**: implementar todas as seções públicas (§4.1–4.7) lendo de dados semeados manualmente no banco (sem admin ainda), com fidelidade visual completa ao protótipo. **Ainda não passou por brainstorm/spec/plano** — só existe como esta descrição de 1 frase; precisa do mesmo processo (`superpowers:brainstorming` → spec → `writing-plans`) que a Fase 0 passou antes de virar código.
+- **Fase 2 — Admin**: login, CRUD de cada seção (§4.8) — incluindo a tela de adicionar/remover admin (FR-26, schema já pronto desde a Fase 0), upload de imagem para Storage, revalidação sob demanda ligada ao salvar. Mesma ressalva: sem spec/plano ainda.
+- **Fase 3 — Polimento e lançamento**: SEO (metadata, OpenGraph), acessibilidade, revisão de conteúdo real com o pastor/admins, checklist de `shipping-and-launch`. Mesma ressalva: sem spec/plano ainda.
 - **v2 (não iniciar agora)**: AbacatePay, construtor drag-n-drop, área do aluno, lembretes de lives/aulas.
 
 ## 11. Fora de escopo (v2 e além)
@@ -137,13 +137,16 @@ AbacatePay (inscrição em cursos/mentorias, compra de livros, cobrança recorre
 
 ## 12. Questões em aberto
 
-Decisões já tomadas nesta rodada (não são mais questões em aberto): itens de agenda expiram automaticamente por data (FR-7); 1 livro no lançamento (FR-10); login do admin por email+senha (§9); Cache Components do Next 16 permanece **desligado** no MVP (modelo clássico `unstable_cache`/`revalidateTag`, já documentado em `CLAUDE.md`).
+Decisões já tomadas nesta rodada (não são mais questões em aberto): itens de agenda expiram automaticamente por data (FR-7); 1 livro no lançamento (FR-10); login do admin por **magic link** com regra de `isSuperAdmin` protegido (FR-26, §9 — revisto após o brainstorm da Fase 0, substitui a decisão anterior de email+senha); Cache Components do Next 16 permanece **desligado** no MVP (modelo clássico `unstable_cache`/`revalidateTag`, já documentado em `CLAUDE.md`).
+
+Resolvido durante a implementação da Fase 0 (detalhe em `CLAUDE.md` §8): Prisma 7.8.0 exige driver adapter (`@prisma/adapter-pg`) pro client de runtime — `schema.prisma` não aceita mais `url`/`directUrl`; conexão do CLI (migrate/seed) e a de runtime da aplicação são caminhos totalmente separados agora.
 
 Ainda em aberto:
 
-1. **context7 indisponível nesta sessão de setup** (nenhum servidor MCP conectado) — versões e docs usadas aqui vêm de `package.json`/`bun.lock`/`node_modules/next/dist/docs`. Antes da Fase 0, rodar context7 para confirmar: conexão do pooler Supabase com Prisma, API atual de Storage/Auth do `@supabase/ssr`, e flags atuais do `shadcn` CLI.
-2. **Biblioteca de geração de QR Code no cliente** (FR-16) ainda não escolhida — candidatos levantados: `react-qr-code` (SVG, leve, ativamente mantida) ou `qrcode.react` (canvas/SVG, base de usuários maior, atualização menos recente). Falta escolher a lib do payload BR Code/EMV (CRC16) que gera a string por trás do QR — decidir e confirmar versões via context7 na fase de planejamento, não nesta etapa de spec.
-3. **Cor de erro/estado destrutivo** (`--destructive`): o protótipo não define uma cor de erro. Proposta (a validar com o time ao ver a tela real do admin): `#E5484D` (vermelho legível em fundo `#161A22`, mesma família de contraste dos demais tokens de texto) — documentado como proposta, não como token oficial do protótipo, em `CLAUDE.md` §5.
+1. **context7 nunca conectou nesta sessão** — Next.js foi coberto com boa confiança via `node_modules/next/dist/docs/`; Prisma e `@supabase/ssr` acabaram verificados sem context7 mesmo assim, lendo os `.d.ts` dos pacotes realmente instalados e testando contra o Supabase de verdade (ver nota em `CLAUDE.md` §10). Ainda falta confirmar: flags atuais do `shadcn` CLI 4.13.1 — só vira bloqueio real quando a Fase 1/2 rodar `bunx shadcn@latest add` pela primeira vez.
+2. **Biblioteca de geração de QR Code no cliente** (FR-16) ainda não escolhida — candidatos levantados: `react-qr-code` (SVG, leve, ativamente mantida) ou `qrcode.react` (canvas/SVG, base de usuários maior, atualização menos recente). Falta escolher a lib do payload BR Code/EMV (CRC16) que gera a string por trás do QR — decidir na fase de planejamento da seção de Ofertas, não nesta etapa de spec.
+3. **Cor de erro/estado destrutivo** (`--destructive`): o protótipo não define uma cor de erro. Valor escolhido: `#EC2030` (vermelho puro, deliberadamente afastado do laranja `--accent` pra não ser confundido com CTA — já aplicado em `app/globals.css` na Fase 0) — ainda vale validar com o time ao ver a tela real de formulário do admin (Fase 2), mas não bloqueia nada até lá.
+4. **Bucket `media` permite listagem pública** (achado do Supabase advisor na Fase 0): a policy de leitura pública do bucket permite enumerar todos os arquivos, não só buscar por URL conhecida. Avaliar na Fase 2 se isso é aceitável (provavelmente sim, já que as imagens são todas de conteúdo público de qualquer forma) ou se vale trocar por uma policy mais restrita (leitura por objeto, sem listagem).
 
 ## 13. Critérios de aceite por feature
 

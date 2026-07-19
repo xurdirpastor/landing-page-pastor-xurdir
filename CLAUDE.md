@@ -46,12 +46,15 @@ components/
   ui/                   # shadcn — gerado via `bunx shadcn@latest add`, não editar à mão além de ajustes de tema
   (demais pastas por domínio, ex.: agenda/, ofertas/, admin/)
 lib/
-  prisma.ts             # client Prisma singleton (server-only)
-  supabase/              # server.ts, client.ts, admin.ts (createServerClient/createBrowserClient)
-  generated/prisma/      # output do generator `prisma-client` (não editar, gerado)
+  prisma.ts             # client Prisma singleton (server-only), com driver adapter @prisma/adapter-pg
+  supabase/              # server.ts (createServerClient p/ RSC/Actions); client.ts, admin.ts a criar quando precisar
+  dal.ts                 # SÓ decisões puras de autorização (resolveAdminAccess, canRemoveAdmin) — zero import, testável sem runtime
+  require-admin.ts       # requireAdmin() — wrapper de I/O (Supabase + Prisma) que usa lib/dal.ts; NÃO junte de volta no mesmo arquivo (ver §7)
+  generated/prisma/      # output do generator `prisma-client` (não editar, gerado) — importar de `lib/generated/prisma/client`, não do diretório bare (não existe index.ts)
   utils.ts               # cn() já existente
 prisma/
-  schema.prisma
+  schema.prisma           # datasource sem url/directUrl (Prisma 7) — só `provider = "postgresql"`
+  seed.ts
   migrations/
 design/                 # NÃO editar — fonte de verdade visual (PDF de tokens + HTML standalone)
 proxy.ts                # checagem otimista de sessão para /admin (substitui o antigo middleware.ts)
@@ -167,9 +170,11 @@ Prisma conecta no Postgres do Supabase com uma connection string privilegiada e 
 **Fonte de verdade do controle de acesso: a aplicação**, em duas camadas:
 
 1. `proxy.ts` (raiz do projeto — nome novo do antigo `middleware.ts` no Next 16) faz uma checagem **otimista**: lê a sessão do Supabase a partir do cookie (via `@supabase/ssr`, método `getAll`/`setAll`, não os `get`/`set` deprecados) e redireciona requisições não autenticadas em `/admin/**` (exceto `/admin/login`) para o login. Roda em toda navegação, então **não** deve bater no banco — só lê o cookie.
-2. Toda Server Action e Route Handler que lê ou muta conteúdo de admin chama um helper `requireAdmin()` num Data Access Layer (`lib/dal.ts`) que **revalida a sessão no servidor** (`supabase.auth.getClaims()`/`getUser()`) **e** confere a tabela `Admin` do Prisma para o papel (`role = 'admin'`). Essa é a checagem **autoritativa** — a do proxy é só UX (evita um flash de conteúdo protegido / redireciona cedo).
+2. Toda Server Action e Route Handler que lê ou muta conteúdo de admin chama `requireAdmin()` (`lib/require-admin.ts`) que **revalida a sessão no servidor** (`supabase.auth.getClaims()`) **e** confere a tabela `Admin` do Prisma para o papel. Essa é a checagem **autoritativa** — a do proxy é só UX (evita um flash de conteúdo protegido / redireciona cedo).
 
-RLS nas tabelas do Supabase fica **ligada como defesa em profundidade** (nega tudo para `anon`/`authenticated`, permitindo só `service_role`) — protege contra qualquer uso futuro do client Supabase direto do browser (hoje não existe, mas a política já existe caso alguém adicione um `supabase-js` client-side sem passar pelo Prisma). Deixar isso explícito em qualquer PR que mexer em `/admin`: **RLS aqui é cinto de segurança extra, não o cinto principal.**
+`requireAdmin()` fica em `lib/require-admin.ts`, **não** em `lib/dal.ts` — `lib/dal.ts` guarda só a decisão pura (`resolveAdminAccess`, `canRemoveAdmin`, sem nenhum import), e `lib/require-admin.ts` importa dessas funções para fazer a parte de I/O (Supabase + Prisma). Não junte os dois de volta no mesmo arquivo: fizemos isso na Fase 0 e quebrou o objetivo de testar a lógica de autorização sem precisar de um runtime Next/Prisma/Supabase.
+
+RLS nas tabelas do Supabase fica **ligada como defesa em profundidade**, com **zero policy** em todas — nega tudo para `anon`/`authenticated` por padrão (não é um TODO, é o estado final desejado até a Fase 2 precisar de alguma leitura pública via um client Supabase direto, o que hoje não existe), permitindo só `service_role`. Protege contra qualquer uso futuro do client Supabase direto do browser sem passar pelo Prisma. Deixar isso explícito em qualquer PR que mexer em `/admin`: **RLS aqui é cinto de segurança extra, não o cinto principal.**
 
 `role` já modelado desde já: `admin` (ativo) e `student` (reservado para v2, não implementar nada que dependa dele agora).
 
@@ -177,13 +182,22 @@ Login do admin é por **magic link** (sem senha) — `Admin` é cadastrado pelo 
 
 ## 8. Banco / ORM
 
-- `prisma/schema.prisma`: generator `prisma-client` (client novo baseado em ESM, **não** o antigo `prisma-client-js`) com `output = "../lib/generated/prisma"` — já configurado no arquivo placeholder atual; importar sempre de `lib/generated/prisma`, nunca de `@prisma/client` direto.
-- Datasource precisa de **duas** URLs (adicionar `directUrl` ao schema, hoje só existe `url`):
-  - `DATABASE_URL` — connection pooler do Supabase (Supavisor, modo transação), usada em runtime pela aplicação (compatível com ambiente serverless).
-  - `DIRECT_URL` — conexão direta do Supabase (sem pooler), usada só por `prisma migrate` / `prisma db push`, porque migrations precisam de recursos de sessão que o modo transação do pooler não sustenta.
-  - ⚠️ Confirmar hostname/porta/parâmetros exatos via context7 (docs atuais do Supabase) antes de configurar — não copiar de memória um padrão antigo.
-- `prisma.config.ts` já usa o formato novo (`defineConfig` de `"prisma/config"`, não a chave `"prisma"` do `package.json`) — manter esse padrão.
+Prisma instalado é **7.8.0** — confirmado empiricamente na Fase 0 que isso é uma reformulação real de como conexão funciona, não só um bump de versão. Registrado aqui porque quebraria de novo se alguém confiar em memória de Prisma 5/6:
+
+- **`schema.prisma` não tem mais `url`/`directUrl`** no bloco `datasource` — Prisma 7 removeu isso (erro `P1012` se tentar). O bloco é só:
+  ```prisma
+  datasource db {
+    provider = "postgresql"
+  }
+  ```
+- **Conexão do CLI** (migrate/introspect/`db seed`) vem de `prisma.config.ts`'s `datasource.url` — hoje aponta pra `DIRECT_URL` (pooler Supavisor, modo sessão, porta 5432), porque migrations precisam de recursos de sessão que o modo transação não sustenta.
+- **Conexão de runtime** (o `PrismaClient` que a aplicação usa) exige um **driver adapter** — `@prisma/adapter-pg`, construído com `{ connectionString: process.env.DATABASE_URL }` (pooler Supavisor, modo transação, porta 6543) e passado como `new PrismaClient({ adapter })`. Sem adapter, o client não tem como conectar (não existe mais fallback implícito via `schema.prisma`). Exemplo real em `lib/prisma.ts`.
+- CLI e runtime usam **conexões completamente separadas** agora — `DATABASE_URL` nunca aparece em `prisma.config.ts`, `DIRECT_URL` nunca aparece em `lib/prisma.ts`.
+- generator `prisma-client` (client novo baseado em ESM, **não** o antigo `prisma-client-js`) com `output = "../lib/generated/prisma"`. **Importar sempre de `lib/generated/prisma/client`** (onde `PrismaClient` de fato é exportado), nunca do diretório bare `lib/generated/prisma` (não existe `index.ts` barrel — confirmado apagando um criado à mão e rodando `prisma generate` de novo, que não o recriou) nem de `@prisma/client` direto.
+- Dependências reais que isso exige (fáceis de esquecer): `@prisma/adapter-pg`, `server-only` (usado por `lib/prisma.ts`/`lib/supabase/server.ts`), `@types/bun` (senão `tsc --noEmit` erra em qualquer arquivo `bun:test`).
+- `prisma.config.ts` já usa o formato novo (`defineConfig` de `"prisma/config"`, não a chave `"prisma"` do `package.json`) — seed também é configurado lá (`migrations.seed`), não no `package.json`.
 - Migrations: `bunx prisma migrate dev` em desenvolvimento; `bunx prisma migrate deploy` em produção/CI. Nunca `db push` em produção.
+- Pra verificar dados/tabelas ao vivo no Supabase, prefira as tools MCP do Supabase (`list_tables`, `execute_sql`) — `bunx prisma db execute` **não imprime resultado de `SELECT`** (só confirma "Script executed successfully" mesmo com a query certa), então é inútil pra esse tipo de verificação.
 
 ## 9. Comandos (Bun)
 
@@ -203,7 +217,7 @@ bunx shadcn@latest add <comp>  # adicionar primitivo (ex.: button, card, badge, 
 
 Antes de usar qualquer API, comando ou versão de Next.js, shadcn/ui, Prisma, Supabase (`@supabase/ssr`, Auth, Storage) ou Tailwind, **consulte a documentação atual via context7** (`resolve-library-id` → `get-library-docs`). Não confie na memória de treinamento — este projeto usa Next 16 (proxy em vez de middleware, Cache Components opcional) e um generator Prisma novo (`prisma-client`), ambos posteriores a boa parte do conhecimento genérico sobre essas ferramentas.
 
-> Nesta sessão de setup, o servidor MCP do context7 **não estava conectado** — os fatos técnicos deste `CLAUDE.md` vieram de `package.json`/`bun.lock` (versões exatas instaladas) e de `node_modules/next/dist/docs/` (docs do Next.js já vendorizadas no projeto). Isso cobre Next.js com boa confiança, mas **não** cobre Prisma/Supabase/Tailwind/shadcn com a mesma profundidade. Antes da primeira tarefa de implementação do `/superpowers:plan`, rode o context7 para confirmar especificamente: (a) sintaxe atual da connection string do pooler Supabase para Prisma, (b) API atual de `createServerClient`/Storage do `@supabase/ssr` nessa versão, (c) flags atuais do `shadcn` CLI 4.13.1.
+> **Atualização pós-Fase 0**: o context7 continuou indisponível durante toda a implementação da Fase 0 (nunca foi conectado nesta sessão). Os pontos (a) e (b) abaixo — Prisma+Supabase e `@supabase/ssr` — acabaram verificados sem ele, por dois caminhos que se mostraram confiáveis o bastante pra esse tipo de checagem: **lendo os `.d.ts` do pacote realmente instalado** em `node_modules/` (foi assim que a mudança do Prisma 7 em `datasource`/driver adapters e o shape de `getClaims()`/`getAll`/`setAll` do `@supabase/ssr` 0.12.3 foram confirmados — não a spec de uma versão genérica) e **testando de verdade contra o banco** (migrations rodaram, seed rodou, sessão de admin foi verificada via Supabase MCP). O Supabase MCP (`plugin:supabase:supabase`) está conectado desde a Fase 0 e tem tools (`list_tables`, `execute_sql`, `apply_migration`, `get_advisors`) melhores que `context7` pra esse projeto especificamente. Ainda falta (c): flags atuais do `shadcn` CLI 4.13.1 — nenhuma tarefa até agora rodou `bunx shadcn@latest add`, então confirmar antes da primeira vez que isso acontecer (Fase 1).
 
 ## 11. Fluxo com Superpowers
 
@@ -213,8 +227,8 @@ Não pular fases: brainstorm → spec → plano (`/superpowers:plan`, tarefas de
 
 | Variável | Descrição |
 |---|---|
-| `DATABASE_URL` | connection string do pooler Supabase (Supavisor), usada em runtime pelo Prisma |
-| `DIRECT_URL` | connection string direta do Supabase, usada só por `prisma migrate` |
+| `DATABASE_URL` | pooler Supabase (Supavisor, modo transação, :6543) — só o driver adapter (`lib/prisma.ts`) usa, em runtime |
+| `DIRECT_URL` | pooler Supabase (Supavisor, modo sessão, :5432) — só `prisma.config.ts` usa, pro CLI (migrate/seed) |
 | `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase (pública, client + server) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | chave anônima do Supabase (pública, respeitada pela RLS) |
 | `SUPABASE_SERVICE_ROLE_KEY` | chave de service role (só server-side, nunca exposta ao client, usada onde for preciso bypassar RLS explicitamente fora do Prisma) |

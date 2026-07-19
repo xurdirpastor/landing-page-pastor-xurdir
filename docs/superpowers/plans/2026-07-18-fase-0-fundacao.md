@@ -1,10 +1,12 @@
 # Fase 0 — Fundação Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **STATUS: COMPLETE** (2026-07-19). All 14 tasks executed and verified — commits `d636bf3..8321449` on `main`, plus a follow-up RLS fix on `public._prisma_migrations` applied directly via Supabase migration (no repo diff). Tasks 1-9 were executed subagent-driven (implementer + task reviewer per task); Tasks 10-14 and the final whole-branch review were executed directly by the controller (subagent-driven-development was stopped mid-plan per user request — see Task 9's note). Real deviations from the text below are called out inline where they were discovered; the durable summary of what changed and why lives in `CLAUDE.md` §7/§8 and `PRD.md` §10/§12, not here — this file is the historical execution record.
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Stand up the technical foundation — Prisma schema, real Supabase connection/Storage, and the `/admin` auth/authorization model (magic-link login, superAdmin protection) — so Fases 1 and 2 have something to build content and screens on top of.
 
-**Architecture:** Prisma (server-only) talks to Supabase Postgres through the Supavisor pooler; Supabase Auth issues sessions via magic link; a thin `proxy.ts` does an optimistic session check while a Prisma-backed `requireAdmin()` in `lib/dal.ts` is the one authoritative authorization gate. RLS is enabled on every app table as defense-in-depth (Prisma's connection owns the tables and bypasses it; `anon`/`authenticated` do not). No UI is built in this phase.
+**Architecture:** Prisma (server-only) talks to Supabase Postgres through the Supavisor pooler; Supabase Auth issues sessions via magic link; a thin `proxy.ts` does an optimistic session check while a Prisma-backed `requireAdmin()` is the one authoritative authorization gate. **As built**, `requireAdmin()` lives in `lib/require-admin.ts`, not `lib/dal.ts` as originally planned below — it was split out during Task 9 to keep `lib/dal.ts`'s pure decision functions (`resolveAdminAccess`, `canRemoveAdmin`) free of Prisma/Supabase/`server-only` imports, which is what keeps them unit-testable without a runtime. RLS is enabled on every app table as defense-in-depth (Prisma's connection owns the tables and bypasses it; `anon`/`authenticated` do not). No UI is built in this phase.
 
 **Tech Stack:** Next.js 16.2.10 (App Router), TypeScript strict, Prisma (generator `prisma-client`, ESM client), `@supabase/ssr` 0.12.3 / `@supabase/supabase-js` 2.110.7, Bun 1.3.12 + `bun:test`, Tailwind CSS 4.3.3.
 
@@ -33,19 +35,19 @@
 **Interfaces:**
 - Produces: working `bunx prisma` CLI, `bun:x prisma generate` writing to `lib/generated/prisma`.
 
-- [ ] **Step 1: Install packages**
+- [x] **Step 1: Install packages**
 
 ```bash
 bun add -d prisma
 bun add @prisma/client dotenv
 ```
 
-- [ ] **Step 2: Verify the CLI resolves and the existing schema is valid**
+- [x] **Step 2: Verify the CLI resolves and the existing schema is valid**
 
 Run: `bunx prisma validate`
 Expected: `The schema at prisma/schema.prisma is valid 🚀`
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add package.json bun.lock
@@ -66,7 +68,7 @@ git commit -m "chore: install prisma and @prisma/client"
 - Produces: models `Admin`, `PastorProfile`, `AboutPillar`, `AgendaItem`, `Book`, `VideoHighlight`, `Testimonial`, `OfferingSettings`, `FooterSettings`; enums `Role`, `AgendaType`, `PixKeyType`. All later tasks (`lib/prisma.ts`, `lib/dal.ts`, `prisma/seed.ts`) depend on these exact field names.
 - Produces: `prisma.config.ts`'s `datasource.url` pointed at `DIRECT_URL` (session-mode pooler, port 5432) — this is the connection the Prisma **CLI** uses for `migrate`/`db execute`/`db seed`'s schema step. `DATABASE_URL` (transaction-mode pooler, port 6543) is reserved for the runtime driver adapter Task 6 configures — the CLI and the app now use two entirely separate connection paths in Prisma 7, not a shared schema-level config.
 
-- [ ] **Step 1: Replace `prisma/schema.prisma` contents**
+- [x] **Step 1: Replace `prisma/schema.prisma` contents**
 
 ```prisma
 // This is your Prisma schema file,
@@ -205,7 +207,7 @@ model FooterSettings {
 }
 ```
 
-- [ ] **Step 2: Update `prisma.config.ts`'s datasource to `DIRECT_URL`**
+- [x] **Step 2: Update `prisma.config.ts`'s datasource to `DIRECT_URL`**
 
 Edit `prisma.config.ts` so the `datasource` block reads:
 
@@ -223,12 +225,12 @@ Edit `prisma.config.ts` so the `datasource` block reads:
 
 (Leave `schema` and `migrations.path` untouched.)
 
-- [ ] **Step 3: Validate**
+- [x] **Step 3: Validate**
 
 Run: `bunx prisma validate`
 Expected: `The schema at prisma/schema.prisma is valid 🚀`
 
-- [ ] **Step 4: Generate the client and confirm the adapter pattern**
+- [x] **Step 4: Generate the client and confirm the adapter pattern**
 
 Run: `bunx prisma generate`
 Expected: `✔ Generated Prisma Client (7.8.0) to ./lib/generated/prisma`
@@ -236,7 +238,7 @@ Expected: `✔ Generated Prisma Client (7.8.0) to ./lib/generated/prisma`
 Run: `grep -n "adapter" lib/generated/prisma/internal/class.ts | head -5`
 Expected: shows the generated doc comment example `adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })` — this confirms Task 6 will use `DATABASE_URL` (not `DIRECT_URL`) for the runtime adapter.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add prisma/schema.prisma prisma.config.ts
@@ -260,19 +262,19 @@ for the runtime adapter."
 - Consumes: `prisma/schema.prisma` from Task 2.
 - Produces: live tables in the `landing-page-xurdir` Supabase Postgres instance; generated client at `lib/generated/prisma`.
 
-- [ ] **Step 1: Run the migration**
+- [x] **Step 1: Run the migration**
 
 Run: `bunx prisma migrate dev --name init`
 Expected: prompts complete without error, ends with `Your database is now in sync with your schema.` and `✔ Generated Prisma Client`.
 
-- [ ] **Step 2: Verify tables exist**
+- [x] **Step 2: Verify tables exist**
 
 > `bunx prisma db execute` runs a script but does not print `SELECT` results (confirmed empirically — it only reports "Script executed successfully" even when the query succeeds). Use the Supabase MCP tool `list_tables` instead, which returns real data.
 
 Using the Supabase MCP tool `list_tables` with `project_id: "flcjszndmddruybziujn"`, `schemas: ["public"]`, `verbose: false`.
 Expected: the `tables` array lists `Admin`, `PastorProfile`, `AboutPillar`, `AgendaItem`, `Book`, `VideoHighlight`, `Testimonial`, `OfferingSettings`, `FooterSettings`, and `_prisma_migrations`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add prisma/migrations
@@ -290,12 +292,12 @@ git commit -m "feat: add initial migration for fase 0 schema"
 - Consumes: tables created in Task 3.
 - Produces: RLS enabled on all 9 app tables. No policies are added — with RLS enabled and zero policies, only the table owner (the Prisma pooler connection) can read/write; `anon`/`authenticated` (used by any future direct Supabase client) get nothing by default. `service_role` in Supabase already bypasses RLS by platform design, so it needs no explicit policy either.
 
-- [ ] **Step 1: Create an empty migration to edit by hand**
+- [x] **Step 1: Create an empty migration to edit by hand**
 
 Run: `bunx prisma migrate dev --create-only --name enable_rls`
 Expected: creates `prisma/migrations/<timestamp>_enable_rls/migration.sql` with no SQL inside yet.
 
-- [ ] **Step 2: Fill in the migration SQL**
+- [x] **Step 2: Fill in the migration SQL**
 
 Edit the generated `migration.sql` file to contain exactly:
 
@@ -311,17 +313,17 @@ ALTER TABLE "OfferingSettings" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "FooterSettings" ENABLE ROW LEVEL SECURITY;
 ```
 
-- [ ] **Step 3: Apply it**
+- [x] **Step 3: Apply it**
 
 Run: `bunx prisma migrate dev`
 Expected: `Your database is now in sync with your schema.` (applies the migration written in Step 2).
 
-- [ ] **Step 4: Verify RLS is on**
+- [x] **Step 4: Verify RLS is on**
 
 Using the Supabase MCP tool `list_tables` with `project_id: "flcjszndmddruybziujn"`, `schemas: ["public"]`, `verbose: false` (same tool as Task 3's Step 2).
 Expected: `rls_enabled: true` for all 9 app tables (it's fine if `_prisma_migrations` itself still shows `rls_enabled: false` — it's Prisma's internal bookkeeping table, not app data, and isn't in this task's list).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add prisma/migrations
@@ -337,7 +339,7 @@ git commit -m "feat: enable row level security on all app tables"
 **Interfaces:**
 - Produces: bucket `media` (public read), with `storage.objects` policies allowing public `select` and `authenticated` `insert`/`update`/`delete` scoped to that bucket. Fase 1/2 image uploads and public `<img>`/`next/image` URLs depend on this.
 
-- [ ] **Step 1: Apply the bucket + policy migration**
+- [x] **Step 1: Apply the bucket + policy migration**
 
 Using the Supabase MCP tool `apply_migration` on project `flcjszndmddruybziujn`, with name `create_media_bucket` and this SQL:
 
@@ -367,7 +369,7 @@ to authenticated
 using (bucket_id = 'media');
 ```
 
-- [ ] **Step 2: Verify**
+- [x] **Step 2: Verify**
 
 Using the Supabase MCP tool `list_migrations` on project `flcjszndmddruybziujn`.
 Expected: `create_media_bucket` appears in the list.
@@ -390,13 +392,13 @@ No commit — nothing changes in the repo for this task.
 - Consumes: `lib/generated/prisma` (generated by Task 3), `@prisma/adapter-pg`.
 - Produces: `export const prisma: PrismaClient` — imported by `lib/dal.ts` (Task 9) and `prisma/seed.ts` (Task 11) uses its own separate instance per Prisma convention, not this one.
 
-- [ ] **Step 1: Install the Postgres driver adapter**
+- [x] **Step 1: Install the Postgres driver adapter**
 
 ```bash
 bun add @prisma/adapter-pg
 ```
 
-- [ ] **Step 2: Write the singleton**
+- [x] **Step 2: Write the singleton**
 
 ```typescript
 import 'server-only'
@@ -414,12 +416,12 @@ if (process.env.NODE_ENV !== 'production') {
 }
 ```
 
-- [ ] **Step 3: Verify it type-checks**
+- [x] **Step 3: Verify it type-checks**
 
 Run: `bunx tsc --noEmit`
 Expected: no errors mentioning `lib/prisma.ts`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add lib/prisma.ts package.json bun.lock
@@ -436,7 +438,7 @@ git commit -m "feat: add prisma client singleton with pg driver adapter"
 **Interfaces:**
 - Produces: `export async function createClient(): Promise<SupabaseClient>` — used by `lib/dal.ts` (Task 9).
 
-- [ ] **Step 1: Write the client factory**
+- [x] **Step 1: Write the client factory**
 
 ```typescript
 import 'server-only'
@@ -470,12 +472,12 @@ export async function createClient() {
 }
 ```
 
-- [ ] **Step 2: Verify it type-checks**
+- [x] **Step 2: Verify it type-checks**
 
 Run: `bunx tsc --noEmit`
 Expected: no errors mentioning `lib/supabase/server.ts`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add lib/supabase/server.ts
@@ -493,7 +495,7 @@ git commit -m "feat: add server-side supabase client factory"
 **Interfaces:**
 - Produces: `resolveAdminAccess(session, adminRecord): AdminAccessResult`, `canRemoveAdmin(target: { isSuperAdmin: boolean }): boolean`, and the types `AdminSession`, `AdminRecord`, `AdminAccessResult`. Task 9 adds the I/O wrapper `requireAdmin()` to this same file, consuming these two functions.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```typescript
 // lib/dal.test.ts
@@ -540,12 +542,12 @@ describe('canRemoveAdmin', () => {
 })
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `bun test lib/dal.test.ts`
 Expected: FAIL — `Cannot find module './dal'` (file doesn't exist yet).
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 ```typescript
 // lib/dal.ts
@@ -590,12 +592,12 @@ export function canRemoveAdmin(target: { isSuperAdmin: boolean }): boolean {
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `bun test lib/dal.test.ts`
 Expected: `5 pass, 0 fail`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add lib/dal.ts lib/dal.test.ts
@@ -615,7 +617,7 @@ git commit -m "feat: add pure admin authorization decisions with tests"
 
 This wrapper glues already-tested pure logic to Next/Supabase/Prisma I/O — per `CLAUDE.md` §14 and the approved spec (`docs/superpowers/specs/2026-07-18-fase-0-fundacao-design.md` §6), it is not unit-tested directly; its correctness rides on the Task 8 tests plus manual verification once `/admin` exists (Fase 2).
 
-- [ ] **Step 1: Append the wrapper to `lib/dal.ts`**
+- [x] **Step 1: Append the wrapper to `lib/dal.ts`**
 
 ```typescript
 import 'server-only'
@@ -661,17 +663,17 @@ export const requireAdmin = cache(async () => {
 
 Note: add the `import 'server-only'` line only once at the top of `lib/dal.ts` (not duplicated from Task 8, which had no imports yet).
 
-- [ ] **Step 2: Verify it type-checks**
+- [x] **Step 2: Verify it type-checks**
 
 Run: `bunx tsc --noEmit`
 Expected: no errors mentioning `lib/dal.ts`.
 
-- [ ] **Step 3: Run the Task 8 tests again to confirm nothing broke**
+- [x] **Step 3: Run the Task 8 tests again to confirm nothing broke**
 
 Run: `bun test lib/dal.test.ts`
 Expected: `5 pass, 0 fail`.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add lib/dal.ts
@@ -689,7 +691,7 @@ git commit -m "feat: add requireAdmin with first-login supabase linking"
 - Consumes: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` env vars.
 - Produces: redirect to `/admin/login` for any unauthenticated request under `/admin/**`. This is the Next 16 rename of `middleware.ts` — same file position, same `config.matcher` mechanism.
 
-- [ ] **Step 1: Write `proxy.ts`**
+- [x] **Step 1: Write `proxy.ts`**
 
 ```typescript
 import { createServerClient } from '@supabase/ssr'
@@ -738,12 +740,12 @@ export const config = {
 }
 ```
 
-- [ ] **Step 2: Verify it type-checks**
+- [x] **Step 2: Verify it type-checks**
 
 Run: `bunx tsc --noEmit`
 Expected: no errors mentioning `proxy.ts`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add proxy.ts
@@ -764,7 +766,7 @@ git commit -m "feat: add optimistic session proxy for /admin routes"
 - Consumes: `lib/generated/prisma` (Task 3), all 9 models (Task 2), `@prisma/adapter-pg` (installed in Task 6).
 - Produces: 1 `Admin` row (`isSuperAdmin: true`), 1 row each in the 4 singleton tables. Fase 1 reads these to render the public page without waiting for real content.
 
-- [ ] **Step 1: Write `prisma/seed.ts`**
+- [x] **Step 1: Write `prisma/seed.ts`**
 
 ```typescript
 import { PrismaPg } from '@prisma/adapter-pg'
@@ -862,7 +864,7 @@ main()
   })
 ```
 
-- [ ] **Step 2: Wire the seed command into `prisma.config.ts`**
+- [x] **Step 2: Wire the seed command into `prisma.config.ts`**
 
 Read the current file first (`prisma.config.ts`), then add a `seed` key inside the existing `migrations` object so it reads:
 
@@ -884,19 +886,19 @@ export default defineConfig({
 
 If `bunx prisma db seed` (Step 3) errors saying it doesn't recognize a `seed` key in `migrations`, that's the "prisma.config.ts seed format" risk flagged in the spec (§8) — in that case fall back to running the seed directly with `bun run prisma/seed.ts` instead of `bunx prisma db seed`, and note the discrepancy in the task's commit message.
 
-- [ ] **Step 3: Run the seed**
+- [x] **Step 3: Run the seed**
 
 Run: `bunx prisma db seed`
 Expected: prints `Seed concluído.` with no errors.
 
-- [ ] **Step 4: Verify the superAdmin row**
+- [x] **Step 4: Verify the superAdmin row**
 
 > `bunx prisma db execute` does not print `SELECT` results (confirmed empirically in Task 3 — it only reports "Script executed successfully"). Use the Supabase MCP tool `execute_sql` instead, which returns real query results.
 
 Using the Supabase MCP tool `execute_sql` with `project_id: "flcjszndmddruybziujn"` and query `select email, "isSuperAdmin", "supabaseUserId" from "Admin";`.
 Expected: one row, `email = fred.rlopes@gmail.com`, `isSuperAdmin = true`, `supabaseUserId` is null.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add prisma/seed.ts prisma.config.ts
@@ -914,7 +916,7 @@ git commit -m "feat: add seed for initial superAdmin and placeholder content"
 - Consumes: token values from `CLAUDE.md` §5 (already documented, sourced from `design/design-system-landing-page-pastor.pdf`).
 - Produces: shadcn CSS variables (`--background`, `--primary`, etc.) and Tailwind theme tokens (`--radius-sm/-lg/-full`, `--font-heading`, `--font-caveat`) matching the prototype. Task 13 (fonts) depends on `--font-heading`/`--font-caveat` existing here.
 
-- [ ] **Step 1: Replace the `@theme inline` block's radius lines**
+- [x] **Step 1: Replace the `@theme inline` block's radius lines**
 
 In `app/globals.css`, replace:
 
@@ -939,7 +941,7 @@ with:
 
 (The prototype only defines sm/md/lg/pill radii — the extra xl/2xl/3xl/4xl tiers from the scaffold don't correspond to any design token, so they're dropped rather than kept unused.)
 
-- [ ] **Step 2: Add font theme tokens**
+- [x] **Step 2: Add font theme tokens**
 
 In the same `@theme inline` block, replace:
 
@@ -957,7 +959,7 @@ with:
   --font-caveat: var(--font-caveat);
 ```
 
-- [ ] **Step 3: Replace `:root` with the prototype's dark tokens**
+- [x] **Step 3: Replace `:root` with the prototype's dark tokens**
 
 Replace the entire `:root { ... }` block with:
 
@@ -986,7 +988,7 @@ Replace the entire `:root { ... }` block with:
 }
 ```
 
-- [ ] **Step 4: Replace `.dark` with the same values**
+- [x] **Step 4: Replace `.dark` with the same values**
 
 Replace the entire `.dark { ... }` block with:
 
@@ -1018,12 +1020,12 @@ Replace the entire `.dark { ... }` block with:
 
 Leave the `@layer base { ... }` block at the bottom of the file unchanged.
 
-- [ ] **Step 5: Verify the build picks it up**
+- [x] **Step 5: Verify the build picks it up**
 
 Run: `bun run build`
 Expected: build completes with no CSS errors (unrelated warnings about missing pages are fine — no route depends on these tokens yet).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add app/globals.css
@@ -1041,7 +1043,7 @@ git commit -m "feat: apply prototype design tokens to globals.css"
 - Consumes: `--font-heading`, `--font-caveat`, `--font-sans` theme tokens from Task 12.
 - Produces: `<html lang="pt-BR" class="dark ...">` with Source Serif 4 / Manrope / Caveat loaded and exposed as the CSS variables the tokens reference.
 
-- [ ] **Step 1: Replace `app/layout.tsx`**
+- [x] **Step 1: Replace `app/layout.tsx`**
 
 ```typescript
 import type { Metadata } from "next";
@@ -1087,12 +1089,12 @@ export default function RootLayout({
 }
 ```
 
-- [ ] **Step 2: Verify it builds**
+- [x] **Step 2: Verify it builds**
 
 Run: `bun run build`
 Expected: build completes with no errors related to font loading or `app/layout.tsx`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add app/layout.tsx
@@ -1108,7 +1110,7 @@ git commit -m "feat: load prototype fonts and force dark mode in root layout"
 
 **Interfaces:** none — documentation only.
 
-- [ ] **Step 1: Write `.env.example`**
+- [x] **Step 1: Write `.env.example`**
 
 ```bash
 # Supavisor pooler (transaction mode) — runtime connection used by the app
@@ -1126,7 +1128,7 @@ SUPABASE_SERVICE_ROLE_KEY="<service-role-key>"
 NEXT_PUBLIC_SITE_URL="http://localhost:3000"
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add .env.example
