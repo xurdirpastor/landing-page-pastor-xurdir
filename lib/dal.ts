@@ -1,4 +1,10 @@
 // lib/dal.ts
+//
+// Pure authorization decisions only — no imports, no I/O. This keeps the file
+// unit-testable without a Next/Prisma/Supabase runtime. The I/O wrapper that
+// wires these decisions to real Supabase/Prisma calls lives in
+// lib/require-admin.ts, which imports from here (not the other way around).
+
 export type AdminSession = { id: string; email: string } | null
 
 export type AdminRecord = {
