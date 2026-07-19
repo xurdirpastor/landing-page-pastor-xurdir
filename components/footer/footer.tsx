@@ -1,4 +1,3 @@
-import { MessageCircle } from 'lucide-react'
 import type { FooterSettings } from '@/lib/generated/prisma/client'
 
 function InstagramIcon(props: React.SVGProps<SVGSVGElement>) {
@@ -32,6 +31,23 @@ function YoutubeIcon(props: React.SVGProps<SVGSVGElement>) {
     >
       <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
       <path d="m10 15 5-3-5-3z" />
+    </svg>
+  )
+}
+
+function WhatsappIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      {...props}
+    >
+      <path d="M20.5 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-11.8 3.3L3 20l1.4-4.8a8.38 8.38 0 0 1-1-4 8.5 8.5 0 1 1 17.1.3z" />
+      <path d="M9 9.4c0-.4.3-.7.6-.7h.6c.3 0 .5.2.6.4l.6 1.4c.1.3.1.5-.1.7l-.5.6c.5 1.1 1.4 2 2.5 2.5l.6-.5c.2-.2.4-.2.7-.1l1.4.6c.2.1.4.3.4.6v.6c0 .3-.3.6-.7.6-2.9-.1-5.6-2.8-5.7-5.7z" />
     </svg>
   )
 }
@@ -101,7 +117,7 @@ export function Footer({ settings }: { settings: FooterSettings }) {
                 rel="noopener noreferrer"
                 className="flex size-10 items-center justify-center rounded-full border border-border text-muted-foreground hover:border-blue-accent hover:text-blue-accent"
               >
-                <MessageCircle className="size-4" />
+                <WhatsappIcon className="size-4" />
               </a>
             </div>
           </div>

@@ -21,7 +21,7 @@ export function BookCard({ book }: { book: Book }) {
           <Button
             render={<a href={book.buyUrl} target="_blank" rel="noopener noreferrer" />}
             nativeButton={false}
-            className="rounded-full"
+            className="h-11 rounded-full px-6 text-[15px] font-bold"
           >
             Comprar agora
           </Button>

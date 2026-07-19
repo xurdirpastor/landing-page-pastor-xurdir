@@ -43,7 +43,7 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
           <SheetClose
             render={<a href="#agenda" />}
             nativeButton={false}
-            className={cn(buttonVariants(), 'w-full rounded-full')}
+            className={cn(buttonVariants(), 'h-11 w-full rounded-full text-[15px] font-bold')}
           >
             Fale Conosco
           </SheetClose>

@@ -34,7 +34,11 @@ export function Navbar() {
         </nav>
 
         <div className="hidden nav:block">
-          <Button render={<a href="#agenda" />} nativeButton={false} className="rounded-full">
+          <Button
+            render={<a href="#agenda" />}
+            nativeButton={false}
+            className="h-10 rounded-full px-5 text-sm font-bold"
+          >
             Fale Conosco
           </Button>
         </div>

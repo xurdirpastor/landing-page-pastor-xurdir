@@ -31,6 +31,7 @@ async function main() {
     },
   })
 
+  await prisma.aboutPillar.deleteMany()
   await prisma.aboutPillar.createMany({
     data: [
       {
@@ -52,12 +53,12 @@ async function main() {
         order: 2,
       },
     ],
-    skipDuplicates: true,
   })
 
   const now = Date.now()
   const days = (n: number) => new Date(now + n * 24 * 60 * 60 * 1000)
 
+  await prisma.agendaItem.deleteMany()
   await prisma.agendaItem.createMany({
     data: [
       {
@@ -104,10 +105,54 @@ async function main() {
         order: 3,
         isPublished: false,
       },
+      {
+        title: 'Vigília de Oração',
+        type: 'online',
+        date: days(3),
+        dateLabel: 'Ter, 22 de julho · 20h00',
+        location: 'Transmissão ao vivo — YouTube',
+        imageUrl: 'https://picsum.photos/seed/agenda-vigilia/680/510',
+        linkUrl: '#agenda',
+        order: 4,
+        isPublished: true,
+      },
+      {
+        title: 'Culto de Batismos',
+        type: 'presencial',
+        date: days(10),
+        dateLabel: 'Ter, 29 de julho · 19h30',
+        location: 'Templo Vida em Aliança — São Paulo/SP',
+        imageUrl: 'https://picsum.photos/seed/agenda-batismo/680/510',
+        linkUrl: '#agenda',
+        order: 5,
+        isPublished: true,
+      },
+      {
+        title: 'Mentoria Individual',
+        type: 'online',
+        date: days(20),
+        dateLabel: 'Sex, 8 de agosto · 15h00',
+        location: 'Chamada de vídeo — Google Meet',
+        imageUrl: 'https://picsum.photos/seed/agenda-individual/680/510',
+        linkUrl: '#agenda',
+        order: 6,
+        isPublished: true,
+      },
+      {
+        title: 'Encontro de Casais',
+        type: 'presencial',
+        date: days(25),
+        dateLabel: 'Sáb, 16 de agosto · 19h00',
+        location: 'Centro de Treinamento — São Paulo/SP',
+        imageUrl: 'https://picsum.photos/seed/agenda-casais/680/510',
+        linkUrl: '#agenda',
+        order: 7,
+        isPublished: true,
+      },
     ],
-    skipDuplicates: true,
   })
 
+  await prisma.book.deleteMany()
   await prisma.book.createMany({
     data: [
       {
@@ -122,9 +167,9 @@ async function main() {
         isPublished: true,
       },
     ],
-    skipDuplicates: true,
   })
 
+  await prisma.testimonial.deleteMany()
   await prisma.testimonial.createMany({
     data: [
       {
@@ -168,7 +213,6 @@ async function main() {
         isPublished: true,
       },
     ],
-    skipDuplicates: true,
   })
 
   await prisma.videoHighlight.upsert({
