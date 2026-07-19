@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  admin
+  student // reserved for v2, unused in MVP
+}
+
+enum AgendaType {
+  presencial
+  online
+}
+
+enum PixKeyType {
+  email
+  cpf
+  cnpj
+  phone
+  random
+}
+
+model Admin {
+  id             String   @id @default(uuid())
+  email          String   @unique
+  supabaseUserId String?  @unique
+  name           String
+  role           Role     @default(admin)
+  isSuperAdmin   Boolean  @default(false)
+  createdAt      DateTime @default(now())
+}
+
+model PastorProfile {
+  id             String @id @default("singleton")
+  heroPhotoUrl   String
+  heroHeadline   String
+  heroHighlight  String
+  heroIntro      String
+  familyPhotoUrl String
+  aboutEyebrow   String
+  aboutHeading   String
+  aboutIntro     String
+}
+
+model AboutPillar {
+  id          String @id @default(uuid())
+  icon        String
+  title       String
+  description String
+  order       Int
+}
+
+model AgendaItem {
+  id          String     @id @default(uuid())
+  title       String
+  type        AgendaType
+  date        DateTime
+  dateLabel   String
+  location    String
+  imageUrl    String
+  linkUrl     String
+  order       Int
+  isPublished Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+}
+
+model Book {
+  id            String  @id @default(uuid())
+  title         String
+  subtitle      String
+  description   String
+  price         Decimal
+  coverImageUrl String
+  buyUrl        String
+  order         Int
+  isPublished   Boolean @default(true)
+}
+
+model VideoHighlight {
+  id            String @id @default("singleton")
+  eyebrow       String
+  title         String
+  description   String
+  thumbnailUrl  String
+  videoUrl      String
+  durationLabel String
+  ctaLabel      String
+}
+
+model Testimonial {
+  id          String  @id @default(uuid())
+  quote       String
+  name        String
+  role        String
+  initials    String
+  avatarColor String
+  order       Int
+  isPublished Boolean @default(true)
+}
+
+model OfferingSettings {
+  id                String     @id @default("singleton")
+  pixKey            String
+  pixKeyType        PixKeyType
+  pixMerchantName   String
+  pixMerchantCity   String
+  nationalBank      String
+  nationalAgency    String
+  nationalAccount   String
+  nationalCnpj      String
+  intlBank          String
+  intlIban          String
+  intlSwift         String
+  intlAccountHolder String
+}
+
+model FooterSettings {
+  id            String @id @default("singleton")
+  cnpj          String
+  address       String
+  instagramUrl  String
+  youtubeUrl    String
+  whatsappUrl   String
+  copyrightText String
+}
