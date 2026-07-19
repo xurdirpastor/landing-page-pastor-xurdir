@@ -13,9 +13,7 @@ export function HeroSection({ profile }: { profile: PastorProfile }) {
         sizes="100vw"
         className="object-cover"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/15" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/10 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-popover to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/25 to-transparent" />
 
       <div className="relative mx-auto w-full max-w-6xl px-6 py-24">
         <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-border-strong bg-background/60 px-4 py-1.5 text-xs font-bold tracking-wide text-foreground uppercase">
