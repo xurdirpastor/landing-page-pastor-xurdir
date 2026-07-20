@@ -7,18 +7,21 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ImageUploadField } from '@/components/admin/image-upload-field'
+import { FormSection } from '@/components/admin/form-section'
 import { saveFooterSettings } from '@/lib/actions/footer-settings'
 import type { FooterSettingsInput } from '@/lib/schemas/footer-settings'
 
 type FooterSettingsFormProps = { initialValues: FooterSettingsInput }
 
-const fields: Array<{ key: keyof FooterSettingsInput; label: string }> = [
+const institutionalFields: Array<{ key: keyof FooterSettingsInput; label: string }> = [
   { key: 'cnpj', label: 'CNPJ' },
   { key: 'address', label: 'Endereço' },
+]
+
+const socialFields: Array<{ key: keyof FooterSettingsInput; label: string }> = [
   { key: 'instagramUrl', label: 'Link do Instagram' },
   { key: 'youtubeUrl', label: 'Link do YouTube' },
   { key: 'whatsappUrl', label: 'Link do WhatsApp' },
-  { key: 'copyrightText', label: 'Texto de copyright' },
 ]
 
 export function FooterSettingsForm({ initialValues }: FooterSettingsFormProps) {
@@ -39,28 +42,50 @@ export function FooterSettingsForm({ initialValues }: FooterSettingsFormProps) {
     })
   }
 
+  function renderField({ key, label }: { key: keyof FooterSettingsInput; label: string }) {
+    return (
+      <Field.Root key={key} name={key} invalid={!!fieldErrors[key]}>
+        <Field.Label>{label}</Field.Label>
+        <Field.Control
+          render={<Input />}
+          value={values[key]}
+          onValueChange={(value) => setValues((v) => ({ ...v, [key]: value }))}
+        />
+        {fieldErrors[key] && <Field.Error>{fieldErrors[key][0]}</Field.Error>}
+      </Field.Root>
+    )
+  }
+
   return (
-    <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-4">
-      <ImageUploadField
-        name="logoUrl"
-        label="Logo do site (usado no cabeçalho e no rodapé)"
-        section="profile"
-        aspectRatio={1}
-        value={values.logoUrl}
-        onValueChange={(url) => setValues((v) => ({ ...v, logoUrl: url }))}
-        error={fieldErrors.logoUrl?.[0]}
-      />
-      {fields.map(({ key, label }) => (
-        <Field.Root key={key} name={key} invalid={!!fieldErrors[key]}>
-          <Field.Label>{label}</Field.Label>
+    <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-6">
+      <FormSection title="Logo">
+        <ImageUploadField
+          name="logoUrl"
+          label="Logo do site (usado no cabeçalho e no rodapé)"
+          section="profile"
+          aspectRatio={1}
+          value={values.logoUrl}
+          onValueChange={(url) => setValues((v) => ({ ...v, logoUrl: url }))}
+          error={fieldErrors.logoUrl?.[0]}
+        />
+      </FormSection>
+
+      <FormSection title="Dados institucionais">{institutionalFields.map(renderField)}</FormSection>
+
+      <FormSection title="Redes sociais">{socialFields.map(renderField)}</FormSection>
+
+      <FormSection title="Rodapé">
+        <Field.Root name="copyrightText" invalid={!!fieldErrors.copyrightText}>
+          <Field.Label>Texto de copyright</Field.Label>
           <Field.Control
             render={<Input />}
-            value={values[key]}
-            onValueChange={(value) => setValues((v) => ({ ...v, [key]: value }))}
+            value={values.copyrightText}
+            onValueChange={(value) => setValues((v) => ({ ...v, copyrightText: value }))}
           />
-          {fieldErrors[key] && <Field.Error>{fieldErrors[key][0]}</Field.Error>}
+          {fieldErrors.copyrightText && <Field.Error>{fieldErrors.copyrightText[0]}</Field.Error>}
         </Field.Root>
-      ))}
+      </FormSection>
+
       <Button type="submit" disabled={isPending}>
         {isPending ? 'Salvando...' : 'Salvar'}
       </Button>

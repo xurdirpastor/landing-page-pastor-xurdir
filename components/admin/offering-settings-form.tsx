@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { FormSection } from '@/components/admin/form-section'
 import { saveOfferingSettings } from '@/lib/actions/offering-settings'
 import type { OfferingSettingsInput } from '@/lib/schemas/offering-settings'
 
@@ -26,18 +27,24 @@ const pixKeyTypeLabels: Record<OfferingSettingsInput['pixKeyType'], string> = {
   random: 'Chave aleatória',
 }
 
-const textFields: Array<{ key: keyof OfferingSettingsInput; label: string }> = [
+const pixFields: Array<{ key: keyof OfferingSettingsInput; label: string }> = [
   { key: 'pixKey', label: 'Chave Pix' },
-  { key: 'pixMerchantName', label: 'Nome do beneficiário (Pix)' },
-  { key: 'pixMerchantCity', label: 'Cidade do beneficiário (Pix)' },
-  { key: 'nationalBank', label: 'Banco (nacional)' },
-  { key: 'nationalAgency', label: 'Agência (nacional)' },
-  { key: 'nationalAccount', label: 'Conta corrente (nacional)' },
-  { key: 'nationalCnpj', label: 'CNPJ (nacional)' },
-  { key: 'intlBank', label: 'Banco (internacional)' },
-  { key: 'intlIban', label: 'IBAN (internacional)' },
-  { key: 'intlSwift', label: 'SWIFT/BIC (internacional)' },
-  { key: 'intlAccountHolder', label: 'Titular (internacional)' },
+  { key: 'pixMerchantName', label: 'Nome do beneficiário' },
+  { key: 'pixMerchantCity', label: 'Cidade do beneficiário' },
+]
+
+const nationalFields: Array<{ key: keyof OfferingSettingsInput; label: string }> = [
+  { key: 'nationalBank', label: 'Banco' },
+  { key: 'nationalAgency', label: 'Agência' },
+  { key: 'nationalAccount', label: 'Conta corrente' },
+  { key: 'nationalCnpj', label: 'CNPJ' },
+]
+
+const intlFields: Array<{ key: keyof OfferingSettingsInput; label: string }> = [
+  { key: 'intlBank', label: 'Banco' },
+  { key: 'intlIban', label: 'IBAN' },
+  { key: 'intlSwift', label: 'SWIFT/BIC' },
+  { key: 'intlAccountHolder', label: 'Titular' },
 ]
 
 export function OfferingSettingsForm({ initialValues }: OfferingSettingsFormProps) {
@@ -58,44 +65,53 @@ export function OfferingSettingsForm({ initialValues }: OfferingSettingsFormProp
     })
   }
 
-  return (
-    <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-4">
-      <Field.Root name="pixKeyType" invalid={!!fieldErrors.pixKeyType}>
-        <Field.Label>Tipo da chave Pix</Field.Label>
-        <Select
-          name="pixKeyType"
-          value={values.pixKeyType}
-          onValueChange={(value) => {
-            if (value) setValues((v) => ({ ...v, pixKeyType: value as OfferingSettingsInput['pixKeyType'] }))
-          }}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Selecione" />
-          </SelectTrigger>
-          <SelectContent>
-            {(Object.keys(pixKeyTypeLabels) as Array<OfferingSettingsInput['pixKeyType']>).map(
-              (type) => (
-                <SelectItem key={type} value={type}>
-                  {pixKeyTypeLabels[type]}
-                </SelectItem>
-              )
-            )}
-          </SelectContent>
-        </Select>
-        {fieldErrors.pixKeyType && <Field.Error>{fieldErrors.pixKeyType[0]}</Field.Error>}
+  function renderField({ key, label }: { key: keyof OfferingSettingsInput; label: string }) {
+    return (
+      <Field.Root key={key} name={key} invalid={!!fieldErrors[key]}>
+        <Field.Label>{label}</Field.Label>
+        <Field.Control
+          render={<Input />}
+          value={values[key]}
+          onValueChange={(value) => setValues((v) => ({ ...v, [key]: value }))}
+        />
+        {fieldErrors[key] && <Field.Error>{fieldErrors[key][0]}</Field.Error>}
       </Field.Root>
+    )
+  }
 
-      {textFields.map(({ key, label }) => (
-        <Field.Root key={key} name={key} invalid={!!fieldErrors[key]}>
-          <Field.Label>{label}</Field.Label>
-          <Field.Control
-            render={<Input />}
-            value={values[key]}
-            onValueChange={(value) => setValues((v) => ({ ...v, [key]: value }))}
-          />
-          {fieldErrors[key] && <Field.Error>{fieldErrors[key][0]}</Field.Error>}
+  return (
+    <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-6">
+      <FormSection title="Pix">
+        <Field.Root name="pixKeyType" invalid={!!fieldErrors.pixKeyType}>
+          <Field.Label>Tipo da chave Pix</Field.Label>
+          <Select
+            name="pixKeyType"
+            value={values.pixKeyType}
+            onValueChange={(value) => {
+              if (value) setValues((v) => ({ ...v, pixKeyType: value as OfferingSettingsInput['pixKeyType'] }))
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecione" />
+            </SelectTrigger>
+            <SelectContent>
+              {(Object.keys(pixKeyTypeLabels) as Array<OfferingSettingsInput['pixKeyType']>).map(
+                (type) => (
+                  <SelectItem key={type} value={type}>
+                    {pixKeyTypeLabels[type]}
+                  </SelectItem>
+                )
+              )}
+            </SelectContent>
+          </Select>
+          {fieldErrors.pixKeyType && <Field.Error>{fieldErrors.pixKeyType[0]}</Field.Error>}
         </Field.Root>
-      ))}
+        {pixFields.map(renderField)}
+      </FormSection>
+
+      <FormSection title="Conta nacional">{nationalFields.map(renderField)}</FormSection>
+
+      <FormSection title="Conta internacional">{intlFields.map(renderField)}</FormSection>
 
       <Button type="submit" disabled={isPending}>
         {isPending ? 'Salvando...' : 'Salvar'}
