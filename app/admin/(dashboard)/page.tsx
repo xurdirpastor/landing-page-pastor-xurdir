@@ -16,8 +16,8 @@ export default function DashboardHomePage() {
   return (
     <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-6">
       {sections.map((section) => (
-        <Link key={section.href} href={section.href}>
-          <Card className="p-6 transition-colors hover:border-border-strong">
+        <Link key={section.href} href={section.href} className="block h-full">
+          <Card className="h-full min-h-36 justify-start p-6 transition-colors hover:border-border-strong">
             <h2 className="font-heading text-lg font-semibold text-foreground">
               {section.title}
             </h2>

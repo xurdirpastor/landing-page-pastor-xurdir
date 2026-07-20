@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { AdminModalPage } from '@/components/admin/admin-modal-page'
 import { TestimonialForm } from '@/components/admin/testimonial-form'
 import type { AVATAR_COLORS } from '@/lib/schemas/testimonial'
 
@@ -13,8 +14,7 @@ export default async function EditTestimonialPage({
   if (!item) notFound()
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="font-heading text-2xl font-semibold text-foreground">Editar depoimento</h1>
+    <AdminModalPage title="Editar depoimento" backHref="/admin/depoimentos">
       <TestimonialForm
         id={item.id}
         initialValues={{
@@ -26,6 +26,6 @@ export default async function EditTestimonialPage({
           order: String(item.order),
         }}
       />
-    </div>
+    </AdminModalPage>
   )
 }

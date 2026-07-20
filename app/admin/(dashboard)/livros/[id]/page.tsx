@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { AdminModalPage } from '@/components/admin/admin-modal-page'
 import { BookForm } from '@/components/admin/book-form'
 
 export default async function EditBookPage({ params }: { params: Promise<{ id: string }> }) {
@@ -8,8 +9,7 @@ export default async function EditBookPage({ params }: { params: Promise<{ id: s
   if (!item) notFound()
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="font-heading text-2xl font-semibold text-foreground">Editar livro</h1>
+    <AdminModalPage title="Editar livro" backHref="/admin/livros">
       <BookForm
         id={item.id}
         initialValues={{
@@ -22,6 +22,6 @@ export default async function EditBookPage({ params }: { params: Promise<{ id: s
           order: String(item.order),
         }}
       />
-    </div>
+    </AdminModalPage>
   )
 }

@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
+import { AdminModalPage } from '@/components/admin/admin-modal-page'
 import { AgendaItemForm } from '@/components/admin/agenda-item-form'
 
 export default async function EditAgendaItemPage({
@@ -12,10 +13,7 @@ export default async function EditAgendaItemPage({
   if (!item) notFound()
 
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="font-heading text-2xl font-semibold text-foreground">
-        Editar item de agenda
-      </h1>
+    <AdminModalPage title="Editar item de agenda" backHref="/admin/agenda">
       <AgendaItemForm
         id={item.id}
         initialValues={{
@@ -29,6 +27,6 @@ export default async function EditAgendaItemPage({
           order: item.order,
         }}
       />
-    </div>
+    </AdminModalPage>
   )
 }

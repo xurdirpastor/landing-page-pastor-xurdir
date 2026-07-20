@@ -1,9 +1,9 @@
+import { AdminModalPage } from '@/components/admin/admin-modal-page'
 import { AgendaItemForm } from '@/components/admin/agenda-item-form'
 
 export default function NewAgendaItemPage() {
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="font-heading text-2xl font-semibold text-foreground">Novo item de agenda</h1>
+    <AdminModalPage title="Novo item de agenda" backHref="/admin/agenda">
       <AgendaItemForm
         initialValues={{
           title: '',
@@ -16,6 +16,6 @@ export default function NewAgendaItemPage() {
           order: 0,
         }}
       />
-    </div>
+    </AdminModalPage>
   )
 }

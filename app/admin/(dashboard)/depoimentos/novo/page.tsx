@@ -1,10 +1,10 @@
+import { AdminModalPage } from '@/components/admin/admin-modal-page'
 import { TestimonialForm } from '@/components/admin/testimonial-form'
 import { AVATAR_COLORS } from '@/lib/schemas/testimonial'
 
 export default function NewTestimonialPage() {
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="font-heading text-2xl font-semibold text-foreground">Novo depoimento</h1>
+    <AdminModalPage title="Novo depoimento" backHref="/admin/depoimentos">
       <TestimonialForm
         initialValues={{
           quote: '',
@@ -15,6 +15,6 @@ export default function NewTestimonialPage() {
           order: '0',
         }}
       />
-    </div>
+    </AdminModalPage>
   )
 }

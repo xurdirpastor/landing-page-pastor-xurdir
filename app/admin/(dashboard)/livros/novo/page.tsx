@@ -1,9 +1,9 @@
+import { AdminModalPage } from '@/components/admin/admin-modal-page'
 import { BookForm } from '@/components/admin/book-form'
 
 export default function NewBookPage() {
   return (
-    <div className="flex flex-col gap-6">
-      <h1 className="font-heading text-2xl font-semibold text-foreground">Novo livro</h1>
+    <AdminModalPage title="Novo livro" backHref="/admin/livros">
       <BookForm
         initialValues={{
           title: '',
@@ -15,6 +15,6 @@ export default function NewBookPage() {
           order: '0',
         }}
       />
-    </div>
+    </AdminModalPage>
   )
 }
