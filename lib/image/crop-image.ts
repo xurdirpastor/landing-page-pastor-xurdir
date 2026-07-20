@@ -1,6 +1,7 @@
 function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new window.Image()
+    image.crossOrigin = 'anonymous'
     image.onload = () => resolve(image)
     image.onerror = reject
     image.src = url

@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, type ChangeEvent, type DragEvent } from 'react'
+import { useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import Image from 'next/image'
 import Cropper, { type Area } from 'react-easy-crop'
 import { Field } from '@base-ui/react/field'
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -37,13 +38,23 @@ export function ImageUploadField({
   onValueChange,
   error,
 }: ImageUploadFieldProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [isDraggingOver, setIsDraggingOver] = useState(false)
-  const [pendingFile, setPendingFile] = useState<{ file: File; objectUrl: string } | null>(null)
+  const [pendingSource, setPendingSource] = useState<{ objectUrl: string; file: File | null } | null>(
+    null
+  )
   const [crop, setCrop] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
   const [croppedArea, setCroppedArea] = useState<Area | null>(null)
+
+  function openCropFor(source: { objectUrl: string; file: File | null }) {
+    setCrop({ x: 0, y: 0 })
+    setZoom(1)
+    setCroppedArea(null)
+    setPendingSource(source)
+  }
 
   function handleFile(file: File) {
     if (!file.type.startsWith('image/')) {
@@ -55,10 +66,13 @@ export function ImageUploadField({
       return
     }
     setUploadError(null)
-    setCrop({ x: 0, y: 0 })
-    setZoom(1)
-    setCroppedArea(null)
-    setPendingFile({ file, objectUrl: URL.createObjectURL(file) })
+    openCropFor({ file, objectUrl: URL.createObjectURL(file) })
+  }
+
+  function handleEditExisting() {
+    if (!value) return
+    setUploadError(null)
+    openCropFor({ file: null, objectUrl: value })
   }
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
@@ -75,18 +89,22 @@ export function ImageUploadField({
   }
 
   function cancelCrop() {
-    if (pendingFile) URL.revokeObjectURL(pendingFile.objectUrl)
-    setPendingFile(null)
+    if (pendingSource?.file) URL.revokeObjectURL(pendingSource.objectUrl)
+    setPendingSource(null)
   }
 
   async function confirmCrop() {
-    if (!pendingFile || !croppedArea) return
+    if (!pendingSource || !croppedArea) return
     setIsUploading(true)
 
     try {
-      const blob = await getCroppedImageBlob(pendingFile.objectUrl, croppedArea)
+      const blob = await getCroppedImageBlob(pendingSource.objectUrl, croppedArea)
       const supabase = createClient()
-      const path = buildUploadPath(section, pendingFile.file.name, crypto.randomUUID())
+      const path = buildUploadPath(
+        section,
+        pendingSource.file?.name ?? 'imagem.jpg',
+        crypto.randomUUID()
+      )
       const { error: uploadErr } = await supabase.storage
         .from('media')
         .upload(path, blob, { contentType: blob.type })
@@ -98,8 +116,8 @@ export function ImageUploadField({
 
       const { data } = supabase.storage.from('media').getPublicUrl(path)
       onValueChange(data.publicUrl)
-      URL.revokeObjectURL(pendingFile.objectUrl)
-      setPendingFile(null)
+      if (pendingSource.file) URL.revokeObjectURL(pendingSource.objectUrl)
+      setPendingSource(null)
     } finally {
       setIsUploading(false)
     }
@@ -110,9 +128,17 @@ export function ImageUploadField({
       <Field.Label>{label}</Field.Label>
 
       {value && (
-        <div className="relative size-40 overflow-hidden rounded-md">
+        <button
+          type="button"
+          onClick={handleEditExisting}
+          className="group relative w-40 overflow-hidden rounded-md ring-1 ring-border"
+          style={{ aspectRatio }}
+        >
           <Image src={value} alt="" fill sizes="160px" className="object-cover" />
-        </div>
+          <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-center text-xs font-semibold text-transparent transition-colors group-hover:bg-black/60 group-hover:text-white">
+            Clique para editar
+          </span>
+        </button>
       )}
 
       <div
@@ -122,12 +148,28 @@ export function ImageUploadField({
         }}
         onDragLeave={() => setIsDraggingOver(false)}
         onDrop={handleDrop}
-        className={`flex flex-col items-center gap-2 rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground ${
+        className={`flex flex-col items-center gap-3 rounded-md border border-dashed p-5 text-center text-sm text-muted-foreground ${
           isDraggingOver ? 'border-ring bg-secondary/30' : 'border-border'
         }`}
       >
-        <p>Arraste uma imagem aqui ou</p>
-        <input type="file" accept="image/*" onChange={handleInputChange} disabled={isUploading} />
+        <p>Arraste uma imagem aqui, ou</p>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isUploading}
+        >
+          Escolher arquivo
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleInputChange}
+          disabled={isUploading}
+          className="hidden"
+        />
       </div>
 
       <input type="hidden" name={name} value={value} />
@@ -136,19 +178,23 @@ export function ImageUploadField({
       {!uploadError && error && <Field.Error>{error}</Field.Error>}
 
       <Dialog
-        open={!!pendingFile}
+        open={!!pendingSource}
         onOpenChange={(open) => {
           if (!open) cancelCrop()
         }}
       >
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Ajustar recorte</DialogTitle>
+            <DialogTitle>Recortar imagem</DialogTitle>
+            <DialogDescription>
+              Ajuste o enquadramento pra área destacada — é assim que a imagem vai aparecer no
+              site.
+            </DialogDescription>
           </DialogHeader>
-          {pendingFile && (
+          {pendingSource && (
             <div className="relative h-80 w-full bg-black">
               <Cropper
-                image={pendingFile.objectUrl}
+                image={pendingSource.objectUrl}
                 crop={crop}
                 zoom={zoom}
                 rotation={0}
@@ -164,7 +210,7 @@ export function ImageUploadField({
               Cancelar
             </Button>
             <Button type="button" disabled={isUploading} onClick={confirmCrop}>
-              {isUploading ? 'Enviando...' : 'Confirmar corte'}
+              {isUploading ? 'Enviando...' : 'Salvar recorte'}
             </Button>
           </DialogFooter>
         </DialogContent>
