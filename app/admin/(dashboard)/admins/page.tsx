@@ -33,7 +33,7 @@ export default async function AdminsPage() {
                 {!admin.isSuperAdmin && (
                   <DeleteConfirmDialog
                     itemLabel={admin.name}
-                    onConfirm={() => removeAdmin(admin.id)}
+                    onConfirm={removeAdmin.bind(null, admin.id)}
                   />
                 )}
               </TableCell>

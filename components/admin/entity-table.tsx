@@ -74,7 +74,7 @@ export function EntityTable<T extends { id: string; isPublished: boolean }>({
                 </Link>
                 <DeleteConfirmDialog
                   itemLabel={itemLabel(item)}
-                  onConfirm={() => onDelete(item.id)}
+                  onConfirm={onDelete.bind(null, item.id)}
                 />
               </div>
             </TableCell>
