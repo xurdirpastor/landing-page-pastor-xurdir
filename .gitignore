@@ -43,3 +43,7 @@ next-env.d.ts
 /lib/generated/prisma
 
 /design/screenshots
+
+.playwright-mcp
+
+.superpowers
