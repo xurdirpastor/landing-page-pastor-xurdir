@@ -6,6 +6,7 @@ import { Field } from '@base-ui/react/field'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { ImageUploadField } from '@/components/admin/image-upload-field'
 import { saveFooterSettings } from '@/lib/actions/footer-settings'
 import type { FooterSettingsInput } from '@/lib/schemas/footer-settings'
 
@@ -40,6 +41,15 @@ export function FooterSettingsForm({ initialValues }: FooterSettingsFormProps) {
 
   return (
     <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-4">
+      <ImageUploadField
+        name="logoUrl"
+        label="Logo do site (usado no cabeçalho e no rodapé)"
+        section="profile"
+        aspectRatio={1}
+        value={values.logoUrl}
+        onValueChange={(url) => setValues((v) => ({ ...v, logoUrl: url }))}
+        error={fieldErrors.logoUrl?.[0]}
+      />
       {fields.map(({ key, label }) => (
         <Field.Root key={key} name={key} invalid={!!fieldErrors[key]}>
           <Field.Label>{label}</Field.Label>

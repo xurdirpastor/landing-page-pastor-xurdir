@@ -9,6 +9,7 @@ export default async function FooterAdminPage() {
       <h1 className="font-heading text-2xl font-semibold text-foreground">Rodapé</h1>
       <FooterSettingsForm
         initialValues={{
+          logoUrl: settings.logoUrl ?? '',
           cnpj: settings.cnpj,
           address: settings.address,
           instagramUrl: settings.instagramUrl,

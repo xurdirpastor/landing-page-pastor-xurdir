@@ -124,7 +124,8 @@ model OfferingSettings {
 }
 
 model FooterSettings {
-  id            String @id @default("singleton")
+  id            String  @id @default("singleton")
+  logoUrl       String?
   cnpj          String
   address       String
   instagramUrl  String
