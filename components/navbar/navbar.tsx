@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button'
+import { LogoMark } from '@/components/brand/logo-mark'
 import { MobileMenu } from './mobile-menu'
 
 const NAV_ITEMS = [
@@ -10,14 +11,12 @@ const NAV_ITEMS = [
   { label: 'Ofertas', href: '#ofertas' },
 ]
 
-export function Navbar() {
+export function Navbar({ logoUrl }: { logoUrl?: string | null }) {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <a href="#hero" className="flex items-center gap-2">
-          <span className="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-blue-primary text-sm font-bold text-primary-foreground">
-            SL
-          </span>
+          <LogoMark logoUrl={logoUrl} />
           <span className="font-heading text-lg font-semibold text-foreground">Seja Livre</span>
         </a>
 

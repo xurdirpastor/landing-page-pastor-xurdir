@@ -1,4 +1,5 @@
 import { FaInstagram, FaYoutube, FaWhatsapp } from 'react-icons/fa'
+import { LogoMark } from '@/components/brand/logo-mark'
 import type { FooterSettings } from '@/lib/generated/prisma/client'
 
 const NAV_LINKS = [
@@ -16,9 +17,7 @@ export function Footer({ settings }: { settings: FooterSettings }) {
         <div className="grid gap-10 nav:grid-cols-3">
           <div>
             <div className="flex items-center gap-2">
-              <span className="flex size-9 items-center justify-center rounded-full bg-gradient-to-br from-primary to-blue-primary text-sm font-bold text-primary-foreground">
-                SL
-              </span>
+              <LogoMark logoUrl={settings.logoUrl} />
               <span className="font-heading text-lg font-semibold text-foreground">Seja Livre</span>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">

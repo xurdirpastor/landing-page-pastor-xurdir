@@ -30,7 +30,7 @@ export default async function Home() {
 
   return (
     <>
-      <Navbar />
+      <Navbar logoUrl={footer.logoUrl} />
       <main>
         <HeroSection profile={profile} />
         <AboutSection profile={profile} pillars={pillars} />
