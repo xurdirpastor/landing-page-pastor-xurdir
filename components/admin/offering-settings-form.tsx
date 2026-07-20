@@ -1,0 +1,105 @@
+'use client'
+
+import { useState, useTransition } from 'react'
+import { Form } from '@base-ui/react/form'
+import { Field } from '@base-ui/react/field'
+import { toast } from 'sonner'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { saveOfferingSettings } from '@/lib/actions/offering-settings'
+import type { OfferingSettingsInput } from '@/lib/schemas/offering-settings'
+
+type OfferingSettingsFormProps = { initialValues: OfferingSettingsInput }
+
+const pixKeyTypeLabels: Record<OfferingSettingsInput['pixKeyType'], string> = {
+  email: 'E-mail',
+  cpf: 'CPF',
+  cnpj: 'CNPJ',
+  phone: 'Telefone',
+  random: 'Chave aleatória',
+}
+
+const textFields: Array<{ key: keyof OfferingSettingsInput; label: string }> = [
+  { key: 'pixKey', label: 'Chave Pix' },
+  { key: 'pixMerchantName', label: 'Nome do beneficiário (Pix)' },
+  { key: 'pixMerchantCity', label: 'Cidade do beneficiário (Pix)' },
+  { key: 'nationalBank', label: 'Banco (nacional)' },
+  { key: 'nationalAgency', label: 'Agência (nacional)' },
+  { key: 'nationalAccount', label: 'Conta corrente (nacional)' },
+  { key: 'nationalCnpj', label: 'CNPJ (nacional)' },
+  { key: 'intlBank', label: 'Banco (internacional)' },
+  { key: 'intlIban', label: 'IBAN (internacional)' },
+  { key: 'intlSwift', label: 'SWIFT/BIC (internacional)' },
+  { key: 'intlAccountHolder', label: 'Titular (internacional)' },
+]
+
+export function OfferingSettingsForm({ initialValues }: OfferingSettingsFormProps) {
+  const [values, setValues] = useState(initialValues)
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({})
+  const [isPending, startTransition] = useTransition()
+
+  function handleSubmit() {
+    startTransition(async () => {
+      const result = await saveOfferingSettings(values)
+      if (!result.success) {
+        setFieldErrors(result.fieldErrors)
+        toast.error('Corrija os campos destacados.')
+        return
+      }
+      setFieldErrors({})
+      toast.success('Dados de ofertas salvos com sucesso.')
+    })
+  }
+
+  return (
+    <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-4">
+      <Field.Root name="pixKeyType" invalid={!!fieldErrors.pixKeyType}>
+        <Field.Label>Tipo da chave Pix</Field.Label>
+        <Select
+          name="pixKeyType"
+          value={values.pixKeyType}
+          onValueChange={(value) => {
+            if (value) setValues((v) => ({ ...v, pixKeyType: value as OfferingSettingsInput['pixKeyType'] }))
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione" />
+          </SelectTrigger>
+          <SelectContent>
+            {(Object.keys(pixKeyTypeLabels) as Array<OfferingSettingsInput['pixKeyType']>).map(
+              (type) => (
+                <SelectItem key={type} value={type}>
+                  {pixKeyTypeLabels[type]}
+                </SelectItem>
+              )
+            )}
+          </SelectContent>
+        </Select>
+        {fieldErrors.pixKeyType && <Field.Error>{fieldErrors.pixKeyType[0]}</Field.Error>}
+      </Field.Root>
+
+      {textFields.map(({ key, label }) => (
+        <Field.Root key={key} name={key} invalid={!!fieldErrors[key]}>
+          <Field.Label>{label}</Field.Label>
+          <Field.Control
+            render={<Input />}
+            value={values[key]}
+            onValueChange={(value) => setValues((v) => ({ ...v, [key]: value }))}
+          />
+          {fieldErrors[key] && <Field.Error>{fieldErrors[key][0]}</Field.Error>}
+        </Field.Root>
+      ))}
+
+      <Button type="submit" disabled={isPending}>
+        {isPending ? 'Salvando...' : 'Salvar'}
+      </Button>
+    </Form>
+  )
+}
