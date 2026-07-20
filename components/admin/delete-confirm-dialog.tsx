@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
+import { LuLoaderCircle } from 'react-icons/lu'
 import {
   Dialog,
   DialogClose,
@@ -50,6 +51,7 @@ export function DeleteConfirmDialog({ itemLabel, onConfirm }: DeleteConfirmDialo
         <DialogFooter>
           <DialogClose render={<Button variant="outline" />}>Cancelar</DialogClose>
           <Button variant="destructive" disabled={isPending} onClick={handleConfirm}>
+            {isPending && <LuLoaderCircle className="size-4 animate-spin" />}
             {isPending ? 'Excluindo...' : 'Confirmar exclusão'}
           </Button>
         </DialogFooter>
