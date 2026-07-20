@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Source_Serif_4, Manrope, Caveat } from "next/font/google";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const sourceSerif4 = Source_Serif_4({
@@ -35,7 +36,10 @@ export default function RootLayout({
       lang="pt-BR"
       className={`dark ${sourceSerif4.variable} ${manrope.variable} ${caveat.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }
