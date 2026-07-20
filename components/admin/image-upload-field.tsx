@@ -64,7 +64,7 @@ export function ImageUploadField({
       <Field.Label>{label}</Field.Label>
       {value && (
         <div className="relative size-40 overflow-hidden rounded-md">
-          <Image src={value} alt="" fill className="object-cover" />
+          <Image src={value} alt="" fill sizes="160px" className="object-cover" />
         </div>
       )}
       <input type="file" accept="image/*" onChange={handleFileChange} disabled={isUploading} />
