@@ -9,7 +9,7 @@ Dar aos ~3 admins um painel em `/admin` pra manter todo o conteúdo público (So
 ## 1. Decisões desta fase (resumo)
 
 - **Upload de imagem**: client sobe direto pro Supabase Storage (browser client com a sessão do admin), não via Server Action. A Server Action só recebe a URL pública resultante e grava no Prisma. Evita reenviar o binário pelo servidor Next.
-- **Forms**: shadcn `Form` (Base UI + `react-hook-form` + `zod`) — validação client-side inline por campo, mesma zod schema reaproveitada dentro da Server Action como segunda camada de validação (defesa em profundidade, consistente com `CLAUDE.md` §7).
+- **Forms**: **não** shadcn `Form`/`react-hook-form` — verificado empiricamente (2026-07-19, `bunx shadcn@latest add form` e `view form`) que o bloco `form` do registry shadcn **não existe** pro style `base-nova` deste projeto (`view form` retorna só `{"name": "form", "type": "registry:ui"}`, sem arquivos/deps; `add form` roda sem erro mas não cria nada, não instala `react-hook-form` nem `zod`). Em vez disso: `@base-ui/react/form` + `@base-ui/react/field` (já uma dependência do projeto, `@base-ui/react` ^1.6.0) — primitivos nativos do Base UI pra isso (`Field.Root` com prop `validate`, `Field.Label`, `Field.Control`, `Field.Error`, `Field.Description`, e `Form` com prop `errors` keyed por `name` do campo). `zod` continua sendo adicionado (só ele, sem `react-hook-form`/`@hookform/resolvers`) — cada domínio tem uma schema zod em `lib/schemas/`, usada dentro do `onFormSubmit` do `Form` (roda `schema.safeParse(formValues)`; se falhar, popula a prop `errors` do `Form` a partir de `error.flatten().fieldErrors`; se passar, chama a Server Action) e de novo dentro da própria Server Action (defesa em profundidade, consistente com `CLAUDE.md` §7). Menos deps novas (só `zod`) e usa o que a stack já tem em vez de reimplementar o que o Base UI já resolve.
 - **Edição de item de lista (Agenda/Livros/Depoimentos/Admins)**: página própria por item (`/admin/agenda/novo`, `/admin/agenda/[id]`), não modal. Formulário com upload de imagem precisa de espaço; página própria também dá URL recarregável.
 - **Bucket `media`**: a policy `media public read` (SELECT amplo, `bucket_id = 'media'`) é removida nesta fase — ela habilita listagem pública do bucket inteiro (achado do Supabase advisor, `public_bucket_allows_listing`, nível WARN, confirmado em 2026-07-19), não é necessária pra servir URLs públicas de objeto (bucket já é `public = true`, isso sozinho já libera o endpoint `/object/public/...`). Fica só a policy de escrita `authenticated` (insert/update/delete), já existente desde a Fase 0.
 - **Reordenação** (`order` de Agenda/Livros/Depoimentos): campo numérico no formulário de edição, não drag-and-drop. Mais simples, suficiente pro FR correspondente, e drag-and-drop reordering é um passo em direção ao construtor visual (fora de escopo, PRD §11).
@@ -51,7 +51,7 @@ components/
   admin/
     sidebar.tsx                 # nav lateral, 'use client' só pro item ativo (usePathname)
     entity-table.tsx             # genérico: colunas + toggle publicado + link editar + excluir (Agenda/Livros/Depoimentos)
-    image-upload-field.tsx       # 'use client' — upload direto pro Storage, preview, integra com RHF
+    image-upload-field.tsx       # 'use client' — upload direto pro Storage, preview, integra com Field.Control (Base UI)
     delete-confirm-dialog.tsx    # 'use client' — Dialog de confirmação antes de Server Action destrutiva
     about-form.tsx
     agenda-form.tsx
@@ -69,7 +69,7 @@ lib/
   schemas/
     pastor-profile.ts  agenda-item.ts  book.ts  video-highlight.ts
     testimonial.ts  offering-settings.ts  footer-settings.ts  admin.ts
-    # cada um: zod schema exportado, reusado como resolver do RHF (client) e dentro da Server Action (server)
+    # cada um: zod schema exportado, reusado no onFormSubmit do Form (client) e dentro da Server Action (server)
   actions/
     auth.ts                      # signInWithOtp (login), signOut (logout)
     pastor-profile.ts  agenda-item.ts  book.ts  video-highlight.ts
@@ -92,21 +92,22 @@ lib/
 
 ## 4. Upload de imagem
 
-- `components/admin/image-upload-field.tsx`: client component integrado a um campo RHF. Ao selecionar um arquivo: valida tipo/tamanho no client → `supabase.storage.from('media').upload('<seção>/<uuid>-<nome>', file)` usando `lib/supabase/client.ts` (sessão do admin logado, autorizada pela policy `authenticated` insert) → `getPublicUrl` → seta o valor do campo RHF com a URL pública e mostra preview. O "Salvar" da página só grava a URL já resolvida — nenhuma Server Action lida com binário.
+- `components/admin/image-upload-field.tsx`: client component, estado próprio (`useState` pra URL/preview/erro) integrado a um `Field.Root name="..."` (Base UI) via um `<input type="hidden" name="..." value={url}>` dentro do `Field.Control`. Ao selecionar um arquivo: valida tipo/tamanho no client → `supabase.storage.from('media').upload('<seção>/<uuid>-<nome>', file)` usando `lib/supabase/client.ts` (sessão do admin logado, autorizada pela policy `authenticated` insert) → `getPublicUrl` → atualiza a URL (refletida no hidden input, que é o que o `onFormSubmit` do `Form` lê) e mostra preview. O "Salvar" da página só grava a URL já resolvida — nenhuma Server Action lida com binário.
 - Path por seção: `media/<profile|agenda|books|video|testimonials>/<uuid>-<filename-slugificado>` (pastas já definidas na Fase 0, `lib/storage/upload-path.ts` formaliza a função pura).
 - Falha de upload: toast de erro, campo mantém a URL anterior (edição) ou fica vazio (criação, bloqueia submit via validação zod de URL obrigatória).
 
 ## 5. Validação e Server Actions
 
-- Uma zod schema por domínio em `lib/schemas/`, espelhando os campos do model Prisma correspondente (PRD §6). Reusada como resolver do `useForm` (shadcn `Form`) e dentro da Server Action via `schema.parse(formValues)`.
-- Toda Server Action de mutação: `requireAdmin()` primeiro (autoritativo, CLAUDE §7) → parse zod → escrita Prisma → `revalidateTag('<seção>')` (mesma tag usada em `lib/content/`) → para listas, `redirect()` de volta pra `/admin/<seção>` com toast de sucesso via search param lido no client; para singletons (Sobre, Vídeo, Ofertas, Rodapé), retorna `{ success, errors }` via `useActionState`, toast (`sonner`) sem navegação.
+- Uma zod schema por domínio em `lib/schemas/`, espelhando os campos do model Prisma correspondente (PRD §6). Reusada dentro do `onFormSubmit={(formValues) => ...}` do `Form` (Base UI) via `schema.safeParse(formValues)` e dentro da Server Action via `schema.parse(formData-as-object)`.
+- `Form` (Base UI) assume o controle da submissão via `onFormSubmit(formValues)` (já com `preventDefault` aplicado) — não dá pra usar `useActionState`/form `action=` nativo em cima dele. Padrão: dentro de `onFormSubmit`, `startTransition(async () => { const result = await saveAction(formValues); if (!result.success) setErrors(result.fieldErrors); else { toast.success(...); router.push(...) } })` — `saveAction` é a Server Action chamada como função async comum (continua sendo uma Server Action de verdade, com seu próprio `requireAdmin()`; só não é invocada via `<form action>`).
+- Toda Server Action de mutação: `requireAdmin()` primeiro (autoritativo, CLAUDE §7) → parse zod → escrita Prisma → `revalidateTag('<seção>')` (mesma tag usada em `lib/content/`) → retorna `{ success: true }` (listas: o client então dá `router.push('/admin/<seção>')` + toast) ou `{ success: false, fieldErrors }` (o client passa `fieldErrors` pra prop `errors` do `Form`).
 - Erros de constraint do Prisma (ex.: `Admin.email` duplicado) capturados na action, retornados como erro de campo, não stack trace genérico.
 
 ## 6. Componentes compartilhados
 
 `EntityTable` cobre Agenda/Livros/Depoimentos (mesma forma: tabela + badge publicado/despublicado + link editar + botão excluir com `DeleteConfirmDialog`) — as 3 seções são estruturalmente idênticas o bastante pra justificar 1 componente genérico em vez de 3 quase-duplicatas. `Sidebar`, `ImageUploadField`, `DeleteConfirmDialog`, `LogoutButton` são usados por praticamente toda página do dashboard.
 
-Novos primitivos shadcn a instalar: `form input textarea select table dialog sonner` (Base UI, conferir código gerado antes de usar — `components.json` já está em `base-nova`, não Radix).
+Novos primitivos shadcn a instalar: `input textarea select table dialog sonner` (`form` **não** — não existe pro style `base-nova`, ver decisão acima; `Form`/`Field` vêm direto de `@base-ui/react`, sem passar pelo CLI). Conferir código gerado antes de usar (Base UI, não Radix) — **confirmado empiricamente que `select.tsx`, `dialog.tsx` e `sonner.tsx` gerados importam de `lucide-react`** (`ChevronDownIcon`/`CheckIcon`/`ChevronUpIcon` em `select.tsx`; `XIcon` em `dialog.tsx`; `CircleCheckIcon`/`InfoIcon`/`TriangleAlertIcon`/`OctagonXIcon`/`Loader2Icon` em `sonner.tsx`) — trocar todos pra `react-icons/lu` (`LuChevronDown`/`LuCheck`/`LuChevronUp`/`LuX`/`LuCircleCheck`/`LuInfo`/`LuTriangleAlert`/`LuOctagonX`/`LuLoader2` — confirmar o nome exato no autocomplete/`node_modules/react-icons/lu/index.d.ts` ao chegar nessa task, `Loader2` é o único desses 5 com risco real de nome diferente) antes de commitar, por `CLAUDE.md` §2. `input.tsx`, `textarea.tsx`, `table.tsx` não importam ícones, nada a trocar.
 
 ## 7. Mapeamento FR → implementação
 
