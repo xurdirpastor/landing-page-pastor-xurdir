@@ -147,10 +147,10 @@ export function ImageUploadField({
           <button
             type="button"
             onClick={handleEditExisting}
-            className="group relative w-16 shrink-0 overflow-hidden rounded-md ring-1 ring-border"
+            className="group relative w-28 shrink-0 overflow-hidden rounded-md ring-1 ring-border"
             style={{ aspectRatio }}
           >
-            <Image src={value} alt="" fill sizes="64px" className="object-cover" />
+            <Image src={value} alt="" fill sizes="112px" className="object-cover" />
             <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-transparent transition-colors group-hover:bg-black/60 group-hover:text-white">
               <LuPencil className="size-4" />
             </span>
