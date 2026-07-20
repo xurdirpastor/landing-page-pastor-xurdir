@@ -84,6 +84,7 @@ export function BookForm({ id, initialValues }: BookFormProps) {
         name="coverImageUrl"
         label="Capa"
         section="books"
+        aspectRatio={11 / 16}
         value={values.coverImageUrl}
         onValueChange={(url) => setValues((v) => ({ ...v, coverImageUrl: url }))}
         error={fieldErrors.coverImageUrl?.[0]}

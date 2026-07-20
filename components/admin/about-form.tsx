@@ -55,6 +55,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
         name="heroPhotoUrl"
         label="Foto de destaque (hero)"
         section="profile"
+        aspectRatio={16 / 9}
         value={values.heroPhotoUrl}
         onValueChange={(url) => setValues((v) => ({ ...v, heroPhotoUrl: url }))}
         error={fieldErrors.heroPhotoUrl?.[0]}
@@ -94,6 +95,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
         name="familyPhotoUrl"
         label="Foto da família"
         section="profile"
+        aspectRatio={4 / 3}
         value={values.familyPhotoUrl}
         onValueChange={(url) => setValues((v) => ({ ...v, familyPhotoUrl: url }))}
         error={fieldErrors.familyPhotoUrl?.[0]}

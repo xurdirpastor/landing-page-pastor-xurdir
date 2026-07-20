@@ -50,6 +50,7 @@ export function VideoHighlightForm({ initialValues }: VideoHighlightFormProps) {
         name="thumbnailUrl"
         label="Thumbnail"
         section="video"
+        aspectRatio={16 / 9}
         value={values.thumbnailUrl}
         onValueChange={(url) => setValues((v) => ({ ...v, thumbnailUrl: url }))}
         error={fieldErrors.thumbnailUrl?.[0]}

@@ -110,6 +110,7 @@ export function AgendaItemForm({ id, initialValues }: AgendaItemFormProps) {
         name="imageUrl"
         label="Foto"
         section="agenda"
+        aspectRatio={4 / 3}
         value={values.imageUrl}
         onValueChange={(url) => setValues((v) => ({ ...v, imageUrl: url }))}
         error={fieldErrors.imageUrl?.[0]}
