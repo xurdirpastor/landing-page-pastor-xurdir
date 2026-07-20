@@ -18,10 +18,16 @@ export async function signIn(email: string): Promise<SignInResult> {
   const admin = await prisma.admin.findUnique({ where: { email: parsed.data } })
   if (admin) {
     const supabase = await createClient()
-    await supabase.auth.signInWithOtp({ email: parsed.data })
+    const { error } = await supabase.auth.signInWithOtp({ email: parsed.data })
+    if (error) {
+      console.error('signInWithOtp failed:', error.message)
+      // Mensagem genérica de propósito — não menciona rate limit nem confirma
+      // que o e-mail é de admin, só que o envio falhou desta vez.
+      return { success: false, error: 'Não foi possível enviar o link agora. Tente novamente em alguns minutos.' }
+    }
   }
 
-  // Sempre a mesma resposta, o e-mail sendo de admin ou não —
+  // Mesma resposta de sucesso, o e-mail sendo de admin ou não —
   // nunca revelar quem está cadastrado (spec da Fase 0 §4.1).
   return { success: true }
 }
