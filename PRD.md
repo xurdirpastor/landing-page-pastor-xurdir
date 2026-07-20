@@ -131,7 +131,7 @@ Singletons (`PastorProfile`, `VideoHighlight`, `OfferingSettings`, `FooterSettin
   1. **Forms**: shadcn não tem bloco `form` pro style `base-nova` deste projeto — usado `@base-ui/react` `Form`/`Field` nativo + `zod` em vez de `react-hook-form` (ver `CLAUDE.md` §6).
   2. **RSC boundary**: passar uma closure (`() => action(id)`) de um Server Component pra prop de um Client Component quebra em runtime (`Event handlers cannot be passed to Client Component props`) — corrigido com `action.bind(null, id)`, o padrão documentado pra Server Action parcialmente aplicada (ver `CLAUDE.md` §6).
   Achado adicional do Supabase advisor corrigido nesta fase: policy `media public read` (SELECT amplo em `storage.objects`) removida — permitia listar o bucket inteiro, não só buscar por URL conhecida; `bucket.public = true` sozinho já serve `/object/public/...`. Spec em `docs/superpowers/specs/2026-07-19-fase-2-admin-design.md`, plano em `docs/superpowers/plans/2026-07-19-fase-2-admin.md` (com os achados de execução documentados inline nas tasks correspondentes).
-- **Fase 3 — Polimento e lançamento**: SEO (metadata, OpenGraph), acessibilidade, revisão de conteúdo real com o pastor/admins, checklist de `shipping-and-launch`. Mesma ressalva: sem spec/plano ainda.
+- **Fase 3 — Polimento e lançamento**: SEO (metadata, OpenGraph), acessibilidade, revisão de conteúdo real com o pastor/admins, checklist de `shipping-and-launch`, revisão do SMTP/domínio do magic link pra produção (ver §12 item 2). Mesma ressalva: sem spec/plano ainda.
 - **v2 (não iniciar agora)**: AbacatePay, construtor drag-n-drop, área do aluno, lembretes de lives/aulas.
 
 ## 11. Fora de escopo (v2 e além)
@@ -161,6 +161,7 @@ Resolvido durante a implementação da Fase 2:
 Ainda em aberto:
 
 1. **context7 nunca conectou em nenhuma sessão até agora** (Fase 0, 1 nem 2) — toda versão/comportamento de API foi verificado lendo `node_modules/` direto e testando contra o Supabase/browser real. Ainda falta confirmar assim que houver uma sessão com o MCP disponível: se isso é uma limitação do ambiente ou só não foi conectado.
+2. **SMTP do Resend configurado só pra dev, precisa revisão no deploy pra produção** — sender atual é `onboarding@resend.dev` (domínio de teste do Resend, sem domínio próprio verificado; funciona porque o destinatário de teste é o mesmo dono da conta Resend). Antes de lançar de verdade (Fase 3): (a) verificar o domínio real do projeto no Resend (DNS: SPF/DKIM), (b) trocar o sender email pra algo como `noreply@<dominio-do-projeto>`, (c) atualizar Site URL e Redirect URLs no Supabase (Authentication → URL Configuration) de `http://localhost:3000` pro domínio de produção, e (d) atualizar `NEXT_PUBLIC_SITE_URL` no ambiente de produção — o template do Magic Link usa `{{ .SiteURL }}`, que segue essa configuração. Sem isso, e-mails de produção sairiam com remetente de teste do Resend e/ou link apontando pra `localhost`.
 
 ## 13. Critérios de aceite por feature
 
