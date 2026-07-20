@@ -49,8 +49,8 @@ export function VideoSection({ video }: { video: VideoHighlight }) {
             {video.description}
           </p>
           <Button
-            type="button"
-            onClick={() => setOpen(true)}
+            render={<a href={video.videoUrl} target="_blank" rel="noopener noreferrer" />}
+            nativeButton={false}
             className="mt-6 h-12 rounded-full px-7 text-[15px] font-bold"
           >
             {video.ctaLabel}
@@ -59,8 +59,8 @@ export function VideoSection({ video }: { video: VideoHighlight }) {
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-3xl">
-          <div className="aspect-video w-full overflow-hidden rounded-md bg-black">
+        <DialogContent className="p-0 ring-0 sm:max-w-3xl">
+          <div className="aspect-video w-full overflow-hidden rounded-xl border border-border bg-black">
             {open && embed.type === 'file' && (
               <video src={embed.src} controls autoPlay className="size-full" />
             )}
