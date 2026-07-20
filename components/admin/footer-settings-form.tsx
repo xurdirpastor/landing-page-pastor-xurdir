@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { Form } from '@base-ui/react/form'
 import { Field } from '@base-ui/react/field'
 import { toast } from 'sonner'
+import { LuLoaderCircle } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ImageUploadField } from '@/components/admin/image-upload-field'
@@ -44,7 +45,7 @@ export function FooterSettingsForm({ initialValues }: FooterSettingsFormProps) {
 
   function renderField({ key, label }: { key: keyof FooterSettingsInput; label: string }) {
     return (
-      <Field.Root key={key} name={key} invalid={!!fieldErrors[key]}>
+      <Field.Root key={key} name={key} invalid={!!fieldErrors[key]} className="flex flex-col gap-1.5">
         <Field.Label>{label}</Field.Label>
         <Field.Control
           render={<Input />}
@@ -75,7 +76,7 @@ export function FooterSettingsForm({ initialValues }: FooterSettingsFormProps) {
       <FormSection title="Redes sociais">{socialFields.map(renderField)}</FormSection>
 
       <FormSection title="Rodapé">
-        <Field.Root name="copyrightText" invalid={!!fieldErrors.copyrightText}>
+        <Field.Root name="copyrightText" invalid={!!fieldErrors.copyrightText} className="flex flex-col gap-1.5">
           <Field.Label>Texto de copyright</Field.Label>
           <Field.Control
             render={<Input />}
@@ -87,6 +88,7 @@ export function FooterSettingsForm({ initialValues }: FooterSettingsFormProps) {
       </FormSection>
 
       <Button type="submit" disabled={isPending}>
+        {isPending && <LuLoaderCircle className="size-4 animate-spin" />}
         {isPending ? 'Salvando...' : 'Salvar'}
       </Button>
     </Form>

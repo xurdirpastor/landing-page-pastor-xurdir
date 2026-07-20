@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { Form } from '@base-ui/react/form'
 import { Field } from '@base-ui/react/field'
 import { toast } from 'sonner'
+import { LuLoaderCircle } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -56,7 +57,7 @@ export function VideoHighlightForm({ initialValues }: VideoHighlightFormProps) {
         error={fieldErrors.thumbnailUrl?.[0]}
       />
       {fields.map(({ key, label, multiline }) => (
-        <Field.Root key={key} name={key} invalid={!!fieldErrors[key]}>
+        <Field.Root key={key} name={key} invalid={!!fieldErrors[key]} className="flex flex-col gap-1.5">
           <Field.Label>{label}</Field.Label>
           <Field.Control
             render={multiline ? <Textarea rows={3} /> : <Input />}
@@ -67,6 +68,7 @@ export function VideoHighlightForm({ initialValues }: VideoHighlightFormProps) {
         </Field.Root>
       ))}
       <Button type="submit" disabled={isPending}>
+        {isPending && <LuLoaderCircle className="size-4 animate-spin" />}
         {isPending ? 'Salvando...' : 'Salvar'}
       </Button>
     </Form>

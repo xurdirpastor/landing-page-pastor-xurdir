@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { Form } from '@base-ui/react/form'
 import { Field } from '@base-ui/react/field'
 import { toast } from 'sonner'
+import { LuLoaderCircle } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -67,7 +68,7 @@ export function OfferingSettingsForm({ initialValues }: OfferingSettingsFormProp
 
   function renderField({ key, label }: { key: keyof OfferingSettingsInput; label: string }) {
     return (
-      <Field.Root key={key} name={key} invalid={!!fieldErrors[key]}>
+      <Field.Root key={key} name={key} invalid={!!fieldErrors[key]} className="flex flex-col gap-1.5">
         <Field.Label>{label}</Field.Label>
         <Field.Control
           render={<Input />}
@@ -82,7 +83,7 @@ export function OfferingSettingsForm({ initialValues }: OfferingSettingsFormProp
   return (
     <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-6">
       <FormSection title="Pix">
-        <Field.Root name="pixKeyType" invalid={!!fieldErrors.pixKeyType}>
+        <Field.Root name="pixKeyType" invalid={!!fieldErrors.pixKeyType} className="flex flex-col gap-1.5">
           <Field.Label>Tipo da chave Pix</Field.Label>
           <Select
             name="pixKeyType"
@@ -114,6 +115,7 @@ export function OfferingSettingsForm({ initialValues }: OfferingSettingsFormProp
       <FormSection title="Conta internacional">{intlFields.map(renderField)}</FormSection>
 
       <Button type="submit" disabled={isPending}>
+        {isPending && <LuLoaderCircle className="size-4 animate-spin" />}
         {isPending ? 'Salvando...' : 'Salvar'}
       </Button>
     </Form>

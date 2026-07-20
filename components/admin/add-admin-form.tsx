@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Form } from '@base-ui/react/form'
 import { Field } from '@base-ui/react/field'
 import { toast } from 'sonner'
+import { LuLoaderCircle } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { addAdmin } from '@/lib/actions/admin'
@@ -31,7 +32,7 @@ export function AddAdminForm() {
 
   return (
     <Form onFormSubmit={() => handleSubmit()} className="flex max-w-md flex-col gap-4">
-      <Field.Root name="email" invalid={!!fieldErrors.email}>
+      <Field.Root name="email" invalid={!!fieldErrors.email} className="flex flex-col gap-1.5">
         <Field.Label>E-mail</Field.Label>
         <Field.Control
           render={<Input type="email" />}
@@ -40,7 +41,7 @@ export function AddAdminForm() {
         />
         {fieldErrors.email && <Field.Error>{fieldErrors.email[0]}</Field.Error>}
       </Field.Root>
-      <Field.Root name="name" invalid={!!fieldErrors.name}>
+      <Field.Root name="name" invalid={!!fieldErrors.name} className="flex flex-col gap-1.5">
         <Field.Label>Nome</Field.Label>
         <Field.Control
           render={<Input />}
@@ -50,6 +51,7 @@ export function AddAdminForm() {
         {fieldErrors.name && <Field.Error>{fieldErrors.name[0]}</Field.Error>}
       </Field.Root>
       <Button type="submit" disabled={isPending}>
+        {isPending && <LuLoaderCircle className="size-4 animate-spin" />}
         {isPending ? 'Adicionando...' : 'Adicionar admin'}
       </Button>
     </Form>

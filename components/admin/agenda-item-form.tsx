@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Form } from '@base-ui/react/form'
 import { Field } from '@base-ui/react/field'
 import { toast } from 'sonner'
+import { LuLoaderCircle } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -46,7 +47,7 @@ export function AgendaItemForm({ id, initialValues }: AgendaItemFormProps) {
 
   return (
     <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-4">
-      <Field.Root name="title" invalid={!!fieldErrors.title}>
+      <Field.Root name="title" invalid={!!fieldErrors.title} className="flex flex-col gap-1.5">
         <Field.Label>Título</Field.Label>
         <Field.Control
           render={<Input />}
@@ -56,7 +57,7 @@ export function AgendaItemForm({ id, initialValues }: AgendaItemFormProps) {
         {fieldErrors.title && <Field.Error>{fieldErrors.title[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="type" invalid={!!fieldErrors.type}>
+      <Field.Root name="type" invalid={!!fieldErrors.type} className="flex flex-col gap-1.5">
         <Field.Label>Tipo</Field.Label>
         <Select
           name="type"
@@ -76,7 +77,7 @@ export function AgendaItemForm({ id, initialValues }: AgendaItemFormProps) {
         {fieldErrors.type && <Field.Error>{fieldErrors.type[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="date" invalid={!!fieldErrors.date}>
+      <Field.Root name="date" invalid={!!fieldErrors.date} className="flex flex-col gap-1.5">
         <Field.Label>Data (ordenação e expiração automática, FR-7)</Field.Label>
         <Field.Control
           render={<Input type="date" />}
@@ -86,7 +87,7 @@ export function AgendaItemForm({ id, initialValues }: AgendaItemFormProps) {
         {fieldErrors.date && <Field.Error>{fieldErrors.date[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="dateLabel" invalid={!!fieldErrors.dateLabel}>
+      <Field.Root name="dateLabel" invalid={!!fieldErrors.dateLabel} className="flex flex-col gap-1.5">
         <Field.Label>Data exibida (texto livre)</Field.Label>
         <Field.Control
           render={<Input placeholder="Qui, 17 de julho · 19h30" />}
@@ -96,7 +97,7 @@ export function AgendaItemForm({ id, initialValues }: AgendaItemFormProps) {
         {fieldErrors.dateLabel && <Field.Error>{fieldErrors.dateLabel[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="location" invalid={!!fieldErrors.location}>
+      <Field.Root name="location" invalid={!!fieldErrors.location} className="flex flex-col gap-1.5">
         <Field.Label>Local</Field.Label>
         <Field.Control
           render={<Input />}
@@ -116,7 +117,7 @@ export function AgendaItemForm({ id, initialValues }: AgendaItemFormProps) {
         error={fieldErrors.imageUrl?.[0]}
       />
 
-      <Field.Root name="linkUrl" invalid={!!fieldErrors.linkUrl}>
+      <Field.Root name="linkUrl" invalid={!!fieldErrors.linkUrl} className="flex flex-col gap-1.5">
         <Field.Label>Link "Saiba mais"</Field.Label>
         <Field.Control
           render={<Input type="url" />}
@@ -126,7 +127,7 @@ export function AgendaItemForm({ id, initialValues }: AgendaItemFormProps) {
         {fieldErrors.linkUrl && <Field.Error>{fieldErrors.linkUrl[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="order" invalid={!!fieldErrors.order}>
+      <Field.Root name="order" invalid={!!fieldErrors.order} className="flex flex-col gap-1.5">
         <Field.Label>Ordem de exibição</Field.Label>
         <Field.Control
           render={<Input type="number" />}
@@ -137,6 +138,7 @@ export function AgendaItemForm({ id, initialValues }: AgendaItemFormProps) {
       </Field.Root>
 
       <Button type="submit" disabled={isPending}>
+        {isPending && <LuLoaderCircle className="size-4 animate-spin" />}
         {isPending ? 'Salvando...' : 'Salvar'}
       </Button>
     </Form>

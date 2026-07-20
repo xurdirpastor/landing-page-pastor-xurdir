@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Form } from '@base-ui/react/form'
 import { Field } from '@base-ui/react/field'
 import { toast } from 'sonner'
+import { LuLoaderCircle } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -40,7 +41,7 @@ export function BookForm({ id, initialValues }: BookFormProps) {
 
   return (
     <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-4">
-      <Field.Root name="title" invalid={!!fieldErrors.title}>
+      <Field.Root name="title" invalid={!!fieldErrors.title} className="flex flex-col gap-1.5">
         <Field.Label>Título</Field.Label>
         <Field.Control
           render={<Input />}
@@ -50,7 +51,7 @@ export function BookForm({ id, initialValues }: BookFormProps) {
         {fieldErrors.title && <Field.Error>{fieldErrors.title[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="subtitle" invalid={!!fieldErrors.subtitle}>
+      <Field.Root name="subtitle" invalid={!!fieldErrors.subtitle} className="flex flex-col gap-1.5">
         <Field.Label>Subtítulo</Field.Label>
         <Field.Control
           render={<Input />}
@@ -60,7 +61,7 @@ export function BookForm({ id, initialValues }: BookFormProps) {
         {fieldErrors.subtitle && <Field.Error>{fieldErrors.subtitle[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="description" invalid={!!fieldErrors.description}>
+      <Field.Root name="description" invalid={!!fieldErrors.description} className="flex flex-col gap-1.5">
         <Field.Label>Descrição</Field.Label>
         <Field.Control
           render={<Textarea rows={3} />}
@@ -70,7 +71,7 @@ export function BookForm({ id, initialValues }: BookFormProps) {
         {fieldErrors.description && <Field.Error>{fieldErrors.description[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="price" invalid={!!fieldErrors.price}>
+      <Field.Root name="price" invalid={!!fieldErrors.price} className="flex flex-col gap-1.5">
         <Field.Label>Preço (R$)</Field.Label>
         <Field.Control
           render={<Input type="number" step="0.01" />}
@@ -90,7 +91,7 @@ export function BookForm({ id, initialValues }: BookFormProps) {
         error={fieldErrors.coverImageUrl?.[0]}
       />
 
-      <Field.Root name="buyUrl" invalid={!!fieldErrors.buyUrl}>
+      <Field.Root name="buyUrl" invalid={!!fieldErrors.buyUrl} className="flex flex-col gap-1.5">
         <Field.Label>Link "Comprar agora"</Field.Label>
         <Field.Control
           render={<Input type="url" />}
@@ -100,7 +101,7 @@ export function BookForm({ id, initialValues }: BookFormProps) {
         {fieldErrors.buyUrl && <Field.Error>{fieldErrors.buyUrl[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="order" invalid={!!fieldErrors.order}>
+      <Field.Root name="order" invalid={!!fieldErrors.order} className="flex flex-col gap-1.5">
         <Field.Label>Ordem de exibição</Field.Label>
         <Field.Control
           render={<Input type="number" />}
@@ -111,6 +112,7 @@ export function BookForm({ id, initialValues }: BookFormProps) {
       </Field.Root>
 
       <Button type="submit" disabled={isPending}>
+        {isPending && <LuLoaderCircle className="size-4 animate-spin" />}
         {isPending ? 'Salvando...' : 'Salvar'}
       </Button>
     </Form>

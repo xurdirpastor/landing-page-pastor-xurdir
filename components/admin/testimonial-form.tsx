@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Form } from '@base-ui/react/form'
 import { Field } from '@base-ui/react/field'
 import { toast } from 'sonner'
+import { LuLoaderCircle } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -48,7 +49,7 @@ export function TestimonialForm({ id, initialValues }: TestimonialFormProps) {
 
   return (
     <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-4">
-      <Field.Root name="quote" invalid={!!fieldErrors.quote}>
+      <Field.Root name="quote" invalid={!!fieldErrors.quote} className="flex flex-col gap-1.5">
         <Field.Label>Depoimento</Field.Label>
         <Field.Control
           render={<Textarea rows={4} />}
@@ -58,7 +59,7 @@ export function TestimonialForm({ id, initialValues }: TestimonialFormProps) {
         {fieldErrors.quote && <Field.Error>{fieldErrors.quote[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="name" invalid={!!fieldErrors.name}>
+      <Field.Root name="name" invalid={!!fieldErrors.name} className="flex flex-col gap-1.5">
         <Field.Label>Nome</Field.Label>
         <Field.Control
           render={<Input />}
@@ -68,7 +69,7 @@ export function TestimonialForm({ id, initialValues }: TestimonialFormProps) {
         {fieldErrors.name && <Field.Error>{fieldErrors.name[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="role" invalid={!!fieldErrors.role}>
+      <Field.Root name="role" invalid={!!fieldErrors.role} className="flex flex-col gap-1.5">
         <Field.Label>Papel/vínculo (ex.: "Membro desde 2021")</Field.Label>
         <Field.Control
           render={<Input />}
@@ -78,7 +79,7 @@ export function TestimonialForm({ id, initialValues }: TestimonialFormProps) {
         {fieldErrors.role && <Field.Error>{fieldErrors.role[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="initials" invalid={!!fieldErrors.initials}>
+      <Field.Root name="initials" invalid={!!fieldErrors.initials} className="flex flex-col gap-1.5">
         <Field.Label>Iniciais do avatar (máx. 3 caracteres)</Field.Label>
         <Field.Control
           render={<Input maxLength={3} />}
@@ -88,7 +89,7 @@ export function TestimonialForm({ id, initialValues }: TestimonialFormProps) {
         {fieldErrors.initials && <Field.Error>{fieldErrors.initials[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="avatarColor" invalid={!!fieldErrors.avatarColor}>
+      <Field.Root name="avatarColor" invalid={!!fieldErrors.avatarColor} className="flex flex-col gap-1.5">
         <Field.Label>Cor do avatar</Field.Label>
         <Select
           name="avatarColor"
@@ -115,7 +116,7 @@ export function TestimonialForm({ id, initialValues }: TestimonialFormProps) {
         {fieldErrors.avatarColor && <Field.Error>{fieldErrors.avatarColor[0]}</Field.Error>}
       </Field.Root>
 
-      <Field.Root name="order" invalid={!!fieldErrors.order}>
+      <Field.Root name="order" invalid={!!fieldErrors.order} className="flex flex-col gap-1.5">
         <Field.Label>Ordem de exibição</Field.Label>
         <Field.Control
           render={<Input type="number" />}
@@ -126,6 +127,7 @@ export function TestimonialForm({ id, initialValues }: TestimonialFormProps) {
       </Field.Root>
 
       <Button type="submit" disabled={isPending}>
+        {isPending && <LuLoaderCircle className="size-4 animate-spin" />}
         {isPending ? 'Salvando...' : 'Salvar'}
       </Button>
     </Form>

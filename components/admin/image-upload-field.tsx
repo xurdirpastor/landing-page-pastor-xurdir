@@ -4,6 +4,8 @@ import { useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import Image from 'next/image'
 import Cropper, { type Area } from 'react-easy-crop'
 import { Field } from '@base-ui/react/field'
+import { toast } from 'sonner'
+import { LuPencil, LuLoaderCircle } from 'react-icons/lu'
 import {
   Dialog,
   DialogContent,
@@ -28,6 +30,17 @@ type ImageUploadFieldProps = {
 }
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024
+const UUID_PREFIX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}-/i
+
+function displayFilename(url: string): string {
+  try {
+    const path = decodeURIComponent(new URL(url).pathname)
+    const basename = path.slice(path.lastIndexOf('/') + 1)
+    return basename.replace(UUID_PREFIX, '')
+  } catch {
+    return url
+  }
+}
 
 export function ImageUploadField({
   name,
@@ -111,6 +124,7 @@ export function ImageUploadField({
 
       if (uploadErr) {
         setUploadError(`Falha no upload: ${uploadErr.message}`)
+        toast.error('Falha ao enviar a imagem.')
         return
       }
 
@@ -118,27 +132,43 @@ export function ImageUploadField({
       onValueChange(data.publicUrl)
       if (pendingSource.file) URL.revokeObjectURL(pendingSource.objectUrl)
       setPendingSource(null)
+      toast.success('Imagem enviada com sucesso.')
     } finally {
       setIsUploading(false)
     }
   }
 
   return (
-    <Field.Root name={name} invalid={!!error || !!uploadError}>
+    <Field.Root name={name} invalid={!!error || !!uploadError} className="flex flex-col gap-1.5">
       <Field.Label>{label}</Field.Label>
 
       {value && (
-        <button
-          type="button"
-          onClick={handleEditExisting}
-          className="group relative w-40 overflow-hidden rounded-md ring-1 ring-border"
-          style={{ aspectRatio }}
-        >
-          <Image src={value} alt="" fill sizes="160px" className="object-cover" />
-          <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-center text-xs font-semibold text-transparent transition-colors group-hover:bg-black/60 group-hover:text-white">
-            Clique para editar
-          </span>
-        </button>
+        <div className="flex items-center gap-3 rounded-md border border-border p-3">
+          <button
+            type="button"
+            onClick={handleEditExisting}
+            className="group relative w-16 shrink-0 overflow-hidden rounded-md ring-1 ring-border"
+            style={{ aspectRatio }}
+          >
+            <Image src={value} alt="" fill sizes="64px" className="object-cover" />
+            <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-transparent transition-colors group-hover:bg-black/60 group-hover:text-white">
+              <LuPencil className="size-4" />
+            </span>
+          </button>
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <p className="truncate text-sm text-foreground">{displayFilename(value)}</p>
+            <p className="text-xs text-muted-foreground">Clique na miniatura pra ajustar o recorte</p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+          >
+            Trocar
+          </Button>
+        </div>
       )}
 
       <div
@@ -148,20 +178,26 @@ export function ImageUploadField({
         }}
         onDragLeave={() => setIsDraggingOver(false)}
         onDrop={handleDrop}
-        className={`flex flex-col items-center gap-3 rounded-md border border-dashed p-5 text-center text-sm text-muted-foreground ${
-          isDraggingOver ? 'border-ring bg-secondary/30' : 'border-border'
-        }`}
+        className={`flex flex-col items-center gap-2 rounded-md border border-dashed text-center text-sm text-muted-foreground ${
+          value ? 'p-3' : 'p-5'
+        } ${isDraggingOver ? 'border-ring bg-secondary/30' : 'border-border'}`}
       >
-        <p>Arraste uma imagem aqui, ou</p>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading}
-        >
-          Escolher arquivo
-        </Button>
+        {value ? (
+          <p className="text-xs">ou arraste uma nova imagem aqui</p>
+        ) : (
+          <>
+            <p>Arraste uma imagem aqui, ou</p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isUploading}
+            >
+              Escolher arquivo
+            </Button>
+          </>
+        )}
         <input
           ref={fileInputRef}
           type="file"
@@ -173,7 +209,12 @@ export function ImageUploadField({
       </div>
 
       <input type="hidden" name={name} value={value} />
-      {isUploading && <p className="text-sm text-muted-foreground">Enviando imagem...</p>}
+      {isUploading && (
+        <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
+          <LuLoaderCircle className="size-3.5 animate-spin" />
+          Enviando imagem...
+        </p>
+      )}
       {uploadError && <Field.Error>{uploadError}</Field.Error>}
       {!uploadError && error && <Field.Error>{error}</Field.Error>}
 
@@ -192,24 +233,30 @@ export function ImageUploadField({
             </DialogDescription>
           </DialogHeader>
           {pendingSource && (
-            <div className="relative h-80 w-full bg-black">
-              <Cropper
-                image={pendingSource.objectUrl}
-                crop={crop}
-                zoom={zoom}
-                rotation={0}
-                aspect={aspectRatio}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={(_, area) => setCroppedArea(area)}
-              />
-            </div>
+            <>
+              {pendingSource.file && (
+                <p className="truncate text-xs text-muted-foreground">{pendingSource.file.name}</p>
+              )}
+              <div className="relative h-80 w-full bg-black">
+                <Cropper
+                  image={pendingSource.objectUrl}
+                  crop={crop}
+                  zoom={zoom}
+                  rotation={0}
+                  aspect={aspectRatio}
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  onCropComplete={(_, area) => setCroppedArea(area)}
+                />
+              </div>
+            </>
           )}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={cancelCrop}>
               Cancelar
             </Button>
             <Button type="button" disabled={isUploading} onClick={confirmCrop}>
+              {isUploading && <LuLoaderCircle className="size-4 animate-spin" />}
               {isUploading ? 'Enviando...' : 'Salvar recorte'}
             </Button>
           </DialogFooter>

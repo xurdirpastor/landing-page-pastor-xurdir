@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { Form } from '@base-ui/react/form'
 import { Field } from '@base-ui/react/field'
 import { toast } from 'sonner'
+import { LuLoaderCircle } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -63,7 +64,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
           error={fieldErrors.heroPhotoUrl?.[0]}
         />
 
-        <Field.Root name="heroHeadline" invalid={!!fieldErrors.heroHeadline}>
+        <Field.Root name="heroHeadline" invalid={!!fieldErrors.heroHeadline} className="flex flex-col gap-1.5">
           <Field.Label>Headline (1ª linha)</Field.Label>
           <Field.Control
             render={<Input />}
@@ -73,7 +74,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
           {fieldErrors.heroHeadline && <Field.Error>{fieldErrors.heroHeadline[0]}</Field.Error>}
         </Field.Root>
 
-        <Field.Root name="heroHighlight" invalid={!!fieldErrors.heroHighlight}>
+        <Field.Root name="heroHighlight" invalid={!!fieldErrors.heroHighlight} className="flex flex-col gap-1.5">
           <Field.Label>Headline manuscrita (2ª linha)</Field.Label>
           <Field.Control
             render={<Input />}
@@ -83,7 +84,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
           {fieldErrors.heroHighlight && <Field.Error>{fieldErrors.heroHighlight[0]}</Field.Error>}
         </Field.Root>
 
-        <Field.Root name="heroIntro" invalid={!!fieldErrors.heroIntro}>
+        <Field.Root name="heroIntro" invalid={!!fieldErrors.heroIntro} className="flex flex-col gap-1.5">
           <Field.Label>Texto de apresentação</Field.Label>
           <Field.Control
             render={<Textarea rows={4} />}
@@ -105,7 +106,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
           error={fieldErrors.familyPhotoUrl?.[0]}
         />
 
-        <Field.Root name="aboutEyebrow" invalid={!!fieldErrors.aboutEyebrow}>
+        <Field.Root name="aboutEyebrow" invalid={!!fieldErrors.aboutEyebrow} className="flex flex-col gap-1.5">
           <Field.Label>Rótulo (eyebrow) de "Uma missão, três frentes"</Field.Label>
           <Field.Control
             render={<Input />}
@@ -115,7 +116,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
           {fieldErrors.aboutEyebrow && <Field.Error>{fieldErrors.aboutEyebrow[0]}</Field.Error>}
         </Field.Root>
 
-        <Field.Root name="aboutHeading" invalid={!!fieldErrors.aboutHeading}>
+        <Field.Root name="aboutHeading" invalid={!!fieldErrors.aboutHeading} className="flex flex-col gap-1.5">
           <Field.Label>Título da seção</Field.Label>
           <Field.Control
             render={<Input />}
@@ -125,7 +126,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
           {fieldErrors.aboutHeading && <Field.Error>{fieldErrors.aboutHeading[0]}</Field.Error>}
         </Field.Root>
 
-        <Field.Root name="aboutIntro" invalid={!!fieldErrors.aboutIntro}>
+        <Field.Root name="aboutIntro" invalid={!!fieldErrors.aboutIntro} className="flex flex-col gap-1.5">
           <Field.Label>Texto introdutório</Field.Label>
           <Field.Control
             render={<Textarea rows={3} />}
@@ -145,6 +146,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
             <Field.Root
               name={`pillars.${index}.icon`}
               invalid={!!fieldErrors[`pillars.${index}.icon`]}
+              className="flex flex-col gap-1.5"
             >
               <Field.Label>Ícone</Field.Label>
               <Select
@@ -172,6 +174,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
             <Field.Root
               name={`pillars.${index}.title`}
               invalid={!!fieldErrors[`pillars.${index}.title`]}
+              className="flex flex-col gap-1.5"
             >
               <Field.Label>Título</Field.Label>
               <Field.Control
@@ -186,6 +189,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
             <Field.Root
               name={`pillars.${index}.description`}
               invalid={!!fieldErrors[`pillars.${index}.description`]}
+              className="flex flex-col gap-1.5"
             >
               <Field.Label>Descrição</Field.Label>
               <Field.Control
@@ -202,6 +206,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
       </FormSection>
 
       <Button type="submit" disabled={isPending}>
+        {isPending && <LuLoaderCircle className="size-4 animate-spin" />}
         {isPending ? 'Salvando...' : 'Salvar'}
       </Button>
     </Form>
