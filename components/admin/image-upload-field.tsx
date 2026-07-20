@@ -63,13 +63,9 @@ export function ImageUploadField({
     <Field.Root name={name} invalid={!!error || !!uploadError}>
       <Field.Label>{label}</Field.Label>
       {value && (
-        <Image
-          src={value}
-          alt=""
-          width={160}
-          height={160}
-          className="rounded-md object-cover"
-        />
+        <div className="relative size-40 overflow-hidden rounded-md">
+          <Image src={value} alt="" fill className="object-cover" />
+        </div>
       )}
       <input type="file" accept="image/*" onChange={handleFileChange} disabled={isUploading} />
       <input type="hidden" name={name} value={value} />
