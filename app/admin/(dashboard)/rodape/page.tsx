@@ -6,7 +6,12 @@ export default async function FooterAdminPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-heading text-2xl font-semibold text-foreground">Rodapé</h1>
+      <div>
+        <h1 className="font-heading text-2xl font-semibold text-foreground">Rodapé</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Logo, CNPJ, endereço, redes sociais e copyright.
+        </p>
+      </div>
       <FooterSettingsForm
         initialValues={{
           logoUrl: settings.logoUrl ?? '',
