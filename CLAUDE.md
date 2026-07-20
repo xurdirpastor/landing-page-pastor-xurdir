@@ -42,26 +42,50 @@ Versões lidas de `package.json` / `bun.lock` / `node_modules` neste repositóri
 ```
 app/
   page.tsx              # home pública "/", compõe as seções de components/<domínio>/
-  admin/                # rotas protegidas: login, dashboard, CRUD por seção
-  layout.tsx            # fontes via next/font, <html class="dark">
+  layout.tsx            # fontes via next/font, <html class="dark">, <Toaster /> (sonner)
+  auth/confirm/route.ts # callback do magic link (Route Handler — exceção sancionada, consumidor é e-mail, não form React)
+  admin/
+    login/page.tsx       # público — form de e-mail (signInWithOtp)
+    (dashboard)/          # route group — isola requireAdmin() num único layout.tsx, não afeta a URL
+                          # layout.tsx (sidebar + logout) + page.tsx (home) + 1 pasta por seção
+                          # (sobre/, agenda/, livros/, video/, depoimentos/, ofertas/, rodape/, admins/)
+                          # — as 3 seções de lista (agenda/livros/depoimentos) têm page.tsx (lista),
+                          # novo/page.tsx e [id]/page.tsx; as 4 singleton (sobre/video/ofertas/rodape)
+                          # e admins/ têm só page.tsx
 components/
   ui/                   # shadcn — gerado via `bunx shadcn@latest add`, não editar à mão além de ajustes de tema
   navbar/, about/, agenda/, video/, books/, testimonials/, offerings/, footer/, admin/
                         # 1 pasta por domínio (decisão da Fase 1: substitui o app/(public)/_sections/
                         # planejado na Fase 0, nunca chegou a ser usado — alinha com o inventário de
                         # componentes do §5, que já organiza por domínio)
+  admin/                 # sidebar.tsx, logout-button.tsx, login-form.tsx, image-upload-field.tsx,
+                        # entity-table.tsx + publish-toggle.tsx (genérico p/ agenda/livros/depoimentos),
+                        # delete-confirm-dialog.tsx, e 1 form por seção (about-form.tsx, agenda-item-form.tsx, etc.)
 lib/
   prisma.ts             # client Prisma singleton (server-only), com driver adapter @prisma/adapter-pg
   content/              # 1 arquivo por entidade (about.ts, agenda.ts, books.ts, video.ts,
-                        # testimonials.ts, offerings.ts, footer.ts) — Prisma + unstable_cache + tag
+                        # testimonials.ts, offerings.ts, footer.ts) — Prisma + unstable_cache + tag (leitura pública)
+  actions/               # Server Actions de mutação do admin — 1 arquivo por domínio + types.ts
+                        # (ActionResult/SimpleActionResult/zodIssuesToFieldErrors compartilhados).
+                        # Separado de lib/content/ de propósito: 'use server' no topo do arquivo
+                        # torna todo export uma action, não misturar com os helpers de leitura.
+  schemas/               # 1 zod schema por domínio — fonte única de validação, usada no client
+                        # (dentro do onFormSubmit do Form) e de novo dentro da Server Action
   pix/                  # crc16.ts + br-code.ts — payload BR Code/EMV do Pix, função pura testada
-  format/                # date.ts (visibilidade/ordenação de agenda), price.ts (R$) — funções puras testadas
-  icons/                 # pillar-icons.tsx — mapa slug→ícone lucide dos cartões de "Sobre"
-  supabase/              # server.ts (createServerClient p/ RSC/Actions); client.ts, admin.ts a criar quando precisar
+  format/                # date.ts (visibilidade/ordenação de agenda), price.ts (formatPriceBRL) — funções puras testadas
+  storage/               # upload-path.ts — buildUploadPath(section, filename, id), função pura testada
+  icons/                 # pillar-icons.tsx — mapa slug→ícone lucide dos cartões de "Sobre" (slugs válidos: file-text, clock, user-plus)
+  supabase/              # server.ts (RSC/Actions), client.ts (browser, login + upload), admin.ts
+                        # (service role — SEM `import 'server-only'`: também usado por scripts/generate-magic-link.ts,
+                        # um script `bun run` fora do bundler do Next, onde o guard do server-only lança em vez
+                        # de virar no-op; a service key já não pode vazar pro client por não ser NEXT_PUBLIC_)
   dal.ts                 # SÓ decisões puras de autorização (resolveAdminAccess, canRemoveAdmin) — zero import, testável sem runtime
   require-admin.ts       # requireAdmin() — wrapper de I/O (Supabase + Prisma) que usa lib/dal.ts; NÃO junte de volta no mesmo arquivo (ver §7)
   generated/prisma/      # output do generator `prisma-client` (não editar, gerado) — importar de `lib/generated/prisma/client`, não do diretório bare (não existe index.ts)
   utils.ts               # cn() já existente
+scripts/
+  generate-magic-link.ts # dev-only — gera URL /auth/confirm real via supabase.auth.admin.generateLink,
+                        # usado pra testar o login (Playwright) sem depender de e-mail de verdade chegar
 prisma/
   schema.prisma           # datasource sem url/directUrl (Prisma 7) — só `provider = "postgresql"`
   seed.ts
@@ -170,8 +194,11 @@ Regra geral: **reproduzir o protótipo fielmente** (paleta, tipografia, espaçam
 - Server Components por padrão; `'use client'` só onde há interatividade real (menu mobile, carrossel de agenda, botão "Copiar" do Pix, formulários do admin).
 - Mutações via **Server Actions** (`'use server'`), não Route Handlers, exceto quando o consumidor não é um form React (ex.: webhook futuro do AbacatePay na v2).
 - Nomenclatura: arquivos/pastas em `kebab-case`, componentes em `PascalCase`, tudo em inglês no código (identificadores, props, nomes de tabela/coluna Prisma); conteúdo (texto renderizado) em pt-BR.
-- Compor UI a partir de primitivos shadcn (`bunx shadcn@latest add <componente>`) em vez de `className` soltas reimplementando algo que já existe como primitivo (`Button`, `Card`, `Badge`, `Sheet`, `Avatar`, `Separator`, `Carousel`, `Table`, `Dialog`, `Form`, `Input`, `Textarea`, `Select`, `Sonner`).
+- Compor UI a partir de primitivos shadcn (`bunx shadcn@latest add <componente>`) em vez de `className` soltas reimplementando algo que já existe como primitivo (`Button`, `Card`, `Badge`, `Sheet`, `Avatar`, `Separator`, `Carousel`, `Table`, `Dialog`, `Input`, `Textarea`, `Select`, `Sonner`). **Exceção: `Form`** — confirmado na Fase 2 (`bunx shadcn add form` e `view form`) que esse bloco não existe pro style `base-nova` deste projeto (roda sem erro, mas não instala nada nem gera arquivo). Formulários usam `@base-ui/react/form` (`Form`) + `@base-ui/react/field` (`Field.Root`/`Label`/`Control`/`Error`) direto — já uma dependência do projeto — combinados com `zod` (única dependência nova) para validação client (dentro do `onFormSubmit`) e server (dentro da Server Action). Sem `react-hook-form`/`@hookform/resolvers`.
 - Ao adaptar o HTML standalone de `design/`: extrair valores (cor, espaçamento, tamanho) diretamente das regras `style="..."` inline dele, mas **nunca** copiar sua sintaxe de template (`sc-for`, `x-import`, `ref="{{ ... }}"`) — reescrever como JSX/TSX idiomático usando os dados vindos do Prisma no lugar dos arrays mockados (`agendaItems`, `testimonials`) do protótipo.
+- **`Select.Root.onValueChange` do Base UI pode passar `null`** mesmo num select obrigatório de item único (é o formato de "deselect") — todo `onValueChange` de `Select` precisa de `if (value) { ... }` antes de gravar no state, senão `tsc` erra (`string | null` não é `string | undefined`).
+- **Passar uma Server Action pra prop de um Client Component**: se precisa de argumento parcialmente aplicado (ex.: um `id` de item numa lista), usar `action.bind(null, id)`, nunca `() => action(id)` — uma closure comum criada num Server Component não é serializável através da fronteira RSC e quebra em runtime (`Event handlers cannot be passed to Client Component props`), mesmo com os tipos batendo (`tsc`/`build` não pegam isso, só se manifesta clicando de verdade num Client Component como `DeleteConfirmDialog`).
+- **`revalidateTag` no Next 16 exige um segundo argumento** (`profile: string | { expire?: number }`) — a forma de 1 argumento é deprecated e `tsc` erra. Usar `revalidateTag(tag, { expire: 0 })` (expiração imediata, equivalente ao comportamento antigo) em vez de `revalidateTag(tag, 'max')` (stale-while-revalidate, serve conteúdo velho na primeira visita depois do save) — o critério de aceite "sem F5 duplo" (PRD §13) exige o primeiro.
 
 ## 7. Modelo de autorização (Prisma + Supabase)
 
@@ -220,7 +247,7 @@ bunx oxlint                    # lint — nunca ESLint
 bun test                       # testes (bun:test)
 bunx prisma migrate dev        # nova migration em dev
 bunx prisma generate           # regenerar client após mudar schema
-bunx shadcn@latest add <comp>  # adicionar primitivo (ex.: button, card, badge, sheet, carousel, avatar, form, dialog, table, sonner)
+bunx shadcn@latest add <comp>  # adicionar primitivo (ex.: button, card, badge, sheet, carousel, avatar, dialog, table, input, textarea, select, sonner — NÃO "form", não existe pro style base-nova, ver §6)
 ```
 
 ## 10. Uso do context7 (regra obrigatória)
