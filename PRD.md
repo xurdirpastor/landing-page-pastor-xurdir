@@ -48,7 +48,7 @@ Navegação pública, nesta ordem (idêntica ao protótipo): **Sobre · Agenda �
 - FR-10: No lançamento, a seção exibe **1 livro** (igual ao protótipo). O modelo de dados já é uma lista ordenável (`order`, `isPublished`), então adicionar um 2º livro no futuro é só um novo registro no admin — não exige mudança de schema, só eventual ajuste de layout (grid) se a lista crescer.
 
 ### 4.4 Vídeo em destaque (`#video`)
-- FR-11: Exibir um bloco de vídeo em destaque: thumbnail com overlay de "play" e duração, rótulo (eyebrow), título, descrição curta, botão "Assistir agora" (link externo, ex.: YouTube).
+- FR-11: Exibir um bloco de vídeo em destaque: thumbnail com overlay de "play" e duração, rótulo (eyebrow), título, descrição curta, botão "Assistir agora". **Atualizado em 2026-07-20**: o vídeo toca inline num lightbox (`Dialog`) na própria página (YouTube/Vimeo embutido via iframe, ou `<video>` nativo se o link for um arquivo) — não é mais link externo abrindo em nova aba. Mudança pedida explicitamente pelo usuário após a Fase 2, não é a decisão original da Fase 1.
 - FR-12: Admin edita o vídeo em destaque atual (thumbnail, título, descrição, link, rótulo, duração). MVP: um vídeo em destaque por vez (não é uma lista/histórico de vídeos).
 
 ### 4.5 Depoimentos / "Vidas transformadas" (`#depoimentos`)
