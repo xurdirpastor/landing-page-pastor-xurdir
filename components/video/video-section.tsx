@@ -1,18 +1,25 @@
+'use client'
+
+import { useState } from 'react'
 import Image from 'next/image'
 import { LuPlay } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { getVideoEmbed } from '@/lib/video/parse-video-embed'
 import type { VideoHighlight } from '@/lib/generated/prisma/client'
 
 export function VideoSection({ video }: { video: VideoHighlight }) {
+  const [open, setOpen] = useState(false)
+  const embed = getVideoEmbed(video.videoUrl)
+
   return (
     <section id="video" className="bg-popover">
       <div className="divider-glow" />
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-[88px] nav:grid-cols-2">
-        <a
-          href={video.videoUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group relative block aspect-video overflow-hidden rounded-lg shadow-md"
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="group relative block aspect-video w-full overflow-hidden rounded-lg shadow-md"
         >
           <Image
             src={video.thumbnailUrl}
@@ -29,7 +36,7 @@ export function VideoSection({ video }: { video: VideoHighlight }) {
           <span className="absolute right-4 bottom-4 rounded-md bg-background/80 px-2.5 py-1 text-xs font-semibold text-foreground">
             {video.durationLabel}
           </span>
-        </a>
+        </button>
 
         <div>
           <p className="text-sm font-bold tracking-[1.3px] text-blue-accent-text uppercase nav:text-xl">
@@ -42,14 +49,33 @@ export function VideoSection({ video }: { video: VideoHighlight }) {
             {video.description}
           </p>
           <Button
-            render={<a href={video.videoUrl} target="_blank" rel="noopener noreferrer" />}
-            nativeButton={false}
+            type="button"
+            onClick={() => setOpen(true)}
             className="mt-6 h-12 rounded-full px-7 text-[15px] font-bold"
           >
             {video.ctaLabel}
           </Button>
         </div>
       </div>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-3xl">
+          <div className="aspect-video w-full overflow-hidden rounded-md bg-black">
+            {open && embed.type === 'file' && (
+              <video src={embed.src} controls autoPlay className="size-full" />
+            )}
+            {open && embed.type !== 'file' && (
+              <iframe
+                src={embed.embedUrl}
+                title={video.title}
+                allow="autoplay; encrypted-media; picture-in-picture"
+                allowFullScreen
+                className="size-full"
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   )
 }
