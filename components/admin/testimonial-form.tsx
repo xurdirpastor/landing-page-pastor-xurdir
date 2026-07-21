@@ -48,48 +48,48 @@ export function TestimonialForm({ id, initialValues }: TestimonialFormProps) {
   }
 
   return (
-    <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-4">
-      <Field.Root name="quote" invalid={!!fieldErrors.quote} className="flex flex-col gap-1.5">
+    <Form onFormSubmit={() => handleSubmit()} errors={fieldErrors} className="flex max-w-xl flex-col gap-4">
+      <Field.Root name="quote" className="flex flex-col gap-1.5">
         <Field.Label>Depoimento</Field.Label>
         <Field.Control
           render={<Textarea rows={4} />}
           value={values.quote}
           onValueChange={(value) => setValues((v) => ({ ...v, quote: value }))}
         />
-        {fieldErrors.quote && <Field.Error>{fieldErrors.quote[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="name" invalid={!!fieldErrors.name} className="flex flex-col gap-1.5">
+      <Field.Root name="name" className="flex flex-col gap-1.5">
         <Field.Label>Nome</Field.Label>
         <Field.Control
           render={<Input />}
           value={values.name}
           onValueChange={(value) => setValues((v) => ({ ...v, name: value }))}
         />
-        {fieldErrors.name && <Field.Error>{fieldErrors.name[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="role" invalid={!!fieldErrors.role} className="flex flex-col gap-1.5">
+      <Field.Root name="role" className="flex flex-col gap-1.5">
         <Field.Label>Papel/vínculo (ex.: "Membro desde 2021")</Field.Label>
         <Field.Control
           render={<Input />}
           value={values.role}
           onValueChange={(value) => setValues((v) => ({ ...v, role: value }))}
         />
-        {fieldErrors.role && <Field.Error>{fieldErrors.role[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="initials" invalid={!!fieldErrors.initials} className="flex flex-col gap-1.5">
+      <Field.Root name="initials" className="flex flex-col gap-1.5">
         <Field.Label>Iniciais do avatar (máx. 3 caracteres)</Field.Label>
         <Field.Control
           render={<Input maxLength={3} />}
           value={values.initials}
           onValueChange={(value) => setValues((v) => ({ ...v, initials: value }))}
         />
-        {fieldErrors.initials && <Field.Error>{fieldErrors.initials[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="avatarColor" invalid={!!fieldErrors.avatarColor} className="flex flex-col gap-1.5">
+      <Field.Root name="avatarColor" className="flex flex-col gap-1.5">
         <Field.Label>Cor do avatar</Field.Label>
         <Select
           name="avatarColor"
@@ -113,17 +113,17 @@ export function TestimonialForm({ id, initialValues }: TestimonialFormProps) {
             ))}
           </SelectContent>
         </Select>
-        {fieldErrors.avatarColor && <Field.Error>{fieldErrors.avatarColor[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="order" invalid={!!fieldErrors.order} className="flex flex-col gap-1.5">
+      <Field.Root name="order" className="flex flex-col gap-1.5">
         <Field.Label>Ordem de exibição</Field.Label>
         <Field.Control
           render={<Input type="number" />}
           value={values.order}
           onValueChange={(value) => setValues((v) => ({ ...v, order: value }))}
         />
-        {fieldErrors.order && <Field.Error>{fieldErrors.order[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
       <Button type="submit" disabled={isPending}>

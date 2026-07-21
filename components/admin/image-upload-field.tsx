@@ -26,7 +26,6 @@ type ImageUploadFieldProps = {
   aspectRatio: number
   value: string
   onValueChange: (url: string) => void
-  error?: string
 }
 
 const MAX_SIZE_BYTES = 5 * 1024 * 1024
@@ -49,7 +48,6 @@ export function ImageUploadField({
   aspectRatio,
   value,
   onValueChange,
-  error,
 }: ImageUploadFieldProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isUploading, setIsUploading] = useState(false)
@@ -139,7 +137,7 @@ export function ImageUploadField({
   }
 
   return (
-    <Field.Root name={name} invalid={!!error || !!uploadError} className="flex flex-col gap-1.5">
+    <Field.Root name={name} invalid={!!uploadError} className="flex flex-col gap-1.5">
       <Field.Label>{label}</Field.Label>
 
       {value && (
@@ -215,8 +213,8 @@ export function ImageUploadField({
           Enviando imagem...
         </p>
       )}
-      {uploadError && <Field.Error>{uploadError}</Field.Error>}
-      {!uploadError && error && <Field.Error>{error}</Field.Error>}
+      {uploadError && <p className="text-sm text-destructive">{uploadError}</p>}
+      <Field.Error />
 
       <Dialog
         open={!!pendingSource}

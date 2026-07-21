@@ -68,22 +68,22 @@ export function OfferingSettingsForm({ initialValues }: OfferingSettingsFormProp
 
   function renderField({ key, label }: { key: keyof OfferingSettingsInput; label: string }) {
     return (
-      <Field.Root key={key} name={key} invalid={!!fieldErrors[key]} className="flex flex-col gap-1.5">
+      <Field.Root key={key} name={key} className="flex flex-col gap-1.5">
         <Field.Label>{label}</Field.Label>
         <Field.Control
           render={<Input />}
           value={values[key]}
           onValueChange={(value) => setValues((v) => ({ ...v, [key]: value }))}
         />
-        {fieldErrors[key] && <Field.Error>{fieldErrors[key][0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
     )
   }
 
   return (
-    <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-6">
+    <Form onFormSubmit={() => handleSubmit()} errors={fieldErrors} className="flex max-w-xl flex-col gap-6">
       <FormSection title="Pix">
-        <Field.Root name="pixKeyType" invalid={!!fieldErrors.pixKeyType} className="flex flex-col gap-1.5">
+        <Field.Root name="pixKeyType" className="flex flex-col gap-1.5">
           <Field.Label>Tipo da chave Pix</Field.Label>
           <Select
             name="pixKeyType"
@@ -105,7 +105,7 @@ export function OfferingSettingsForm({ initialValues }: OfferingSettingsFormProp
               )}
             </SelectContent>
           </Select>
-          {fieldErrors.pixKeyType && <Field.Error>{fieldErrors.pixKeyType[0]}</Field.Error>}
+          <Field.Error />
         </Field.Root>
         {pixFields.map(renderField)}
       </FormSection>

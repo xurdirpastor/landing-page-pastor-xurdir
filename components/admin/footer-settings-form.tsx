@@ -45,20 +45,20 @@ export function FooterSettingsForm({ initialValues }: FooterSettingsFormProps) {
 
   function renderField({ key, label }: { key: keyof FooterSettingsInput; label: string }) {
     return (
-      <Field.Root key={key} name={key} invalid={!!fieldErrors[key]} className="flex flex-col gap-1.5">
+      <Field.Root key={key} name={key} className="flex flex-col gap-1.5">
         <Field.Label>{label}</Field.Label>
         <Field.Control
           render={<Input />}
           value={values[key]}
           onValueChange={(value) => setValues((v) => ({ ...v, [key]: value }))}
         />
-        {fieldErrors[key] && <Field.Error>{fieldErrors[key][0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
     )
   }
 
   return (
-    <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-6">
+    <Form onFormSubmit={() => handleSubmit()} errors={fieldErrors} className="flex max-w-xl flex-col gap-6">
       <FormSection title="Logo">
         <ImageUploadField
           name="logoUrl"
@@ -67,7 +67,6 @@ export function FooterSettingsForm({ initialValues }: FooterSettingsFormProps) {
           aspectRatio={1}
           value={values.logoUrl}
           onValueChange={(url) => setValues((v) => ({ ...v, logoUrl: url }))}
-          error={fieldErrors.logoUrl?.[0]}
         />
       </FormSection>
 
@@ -76,14 +75,14 @@ export function FooterSettingsForm({ initialValues }: FooterSettingsFormProps) {
       <FormSection title="Redes sociais">{socialFields.map(renderField)}</FormSection>
 
       <FormSection title="Rodapé">
-        <Field.Root name="copyrightText" invalid={!!fieldErrors.copyrightText} className="flex flex-col gap-1.5">
+        <Field.Root name="copyrightText" className="flex flex-col gap-1.5">
           <Field.Label>Texto de copyright</Field.Label>
           <Field.Control
             render={<Input />}
             value={values.copyrightText}
             onValueChange={(value) => setValues((v) => ({ ...v, copyrightText: value }))}
           />
-          {fieldErrors.copyrightText && <Field.Error>{fieldErrors.copyrightText[0]}</Field.Error>}
+          <Field.Error />
         </Field.Root>
       </FormSection>
 

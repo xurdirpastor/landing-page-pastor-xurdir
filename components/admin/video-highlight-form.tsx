@@ -46,7 +46,7 @@ export function VideoHighlightForm({ initialValues }: VideoHighlightFormProps) {
   ]
 
   return (
-    <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-4">
+    <Form onFormSubmit={() => handleSubmit()} errors={fieldErrors} className="flex max-w-xl flex-col gap-4">
       <ImageUploadField
         name="thumbnailUrl"
         label="Thumbnail"
@@ -54,17 +54,16 @@ export function VideoHighlightForm({ initialValues }: VideoHighlightFormProps) {
         aspectRatio={16 / 9}
         value={values.thumbnailUrl}
         onValueChange={(url) => setValues((v) => ({ ...v, thumbnailUrl: url }))}
-        error={fieldErrors.thumbnailUrl?.[0]}
       />
       {fields.map(({ key, label, multiline }) => (
-        <Field.Root key={key} name={key} invalid={!!fieldErrors[key]} className="flex flex-col gap-1.5">
+        <Field.Root key={key} name={key} className="flex flex-col gap-1.5">
           <Field.Label>{label}</Field.Label>
           <Field.Control
             render={multiline ? <Textarea rows={3} /> : <Input />}
             value={values[key]}
             onValueChange={(value) => setValues((v) => ({ ...v, [key]: value }))}
           />
-          {fieldErrors[key] && <Field.Error>{fieldErrors[key][0]}</Field.Error>}
+          <Field.Error />
         </Field.Root>
       ))}
       <Button type="submit" disabled={isPending}>

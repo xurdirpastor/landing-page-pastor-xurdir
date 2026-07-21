@@ -36,15 +36,19 @@ export function LoginForm() {
   }
 
   return (
-    <Form onFormSubmit={() => handleSubmit()} className="flex flex-col gap-4">
-      <Field.Root name="email" invalid={!!error} className="flex flex-col gap-1.5">
+    <Form
+      onFormSubmit={() => handleSubmit()}
+      errors={error ? { email: [error] } : {}}
+      className="flex flex-col gap-4"
+    >
+      <Field.Root name="email" className="flex flex-col gap-1.5">
         <Field.Label>E-mail</Field.Label>
         <Field.Control
           render={<Input type="email" placeholder="voce@exemplo.com" />}
           value={email}
           onValueChange={(value) => setEmail(value)}
         />
-        {error && <Field.Error>{error}</Field.Error>}
+        <Field.Error />
       </Field.Root>
       <Button type="submit" disabled={isPending || email.length === 0}>
         {isPending && <LuLoaderCircle className="size-4 animate-spin" />}

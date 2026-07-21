@@ -40,45 +40,45 @@ export function BookForm({ id, initialValues }: BookFormProps) {
   }
 
   return (
-    <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-4">
-      <Field.Root name="title" invalid={!!fieldErrors.title} className="flex flex-col gap-1.5">
+    <Form onFormSubmit={() => handleSubmit()} errors={fieldErrors} className="flex max-w-xl flex-col gap-4">
+      <Field.Root name="title" className="flex flex-col gap-1.5">
         <Field.Label>Título</Field.Label>
         <Field.Control
           render={<Input />}
           value={values.title}
           onValueChange={(value) => setValues((v) => ({ ...v, title: value }))}
         />
-        {fieldErrors.title && <Field.Error>{fieldErrors.title[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="subtitle" invalid={!!fieldErrors.subtitle} className="flex flex-col gap-1.5">
+      <Field.Root name="subtitle" className="flex flex-col gap-1.5">
         <Field.Label>Subtítulo</Field.Label>
         <Field.Control
           render={<Input />}
           value={values.subtitle}
           onValueChange={(value) => setValues((v) => ({ ...v, subtitle: value }))}
         />
-        {fieldErrors.subtitle && <Field.Error>{fieldErrors.subtitle[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="description" invalid={!!fieldErrors.description} className="flex flex-col gap-1.5">
+      <Field.Root name="description" className="flex flex-col gap-1.5">
         <Field.Label>Descrição</Field.Label>
         <Field.Control
           render={<Textarea rows={3} />}
           value={values.description}
           onValueChange={(value) => setValues((v) => ({ ...v, description: value }))}
         />
-        {fieldErrors.description && <Field.Error>{fieldErrors.description[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="price" invalid={!!fieldErrors.price} className="flex flex-col gap-1.5">
+      <Field.Root name="price" className="flex flex-col gap-1.5">
         <Field.Label>Preço (R$)</Field.Label>
         <Field.Control
           render={<Input type="number" step="0.01" />}
           value={values.price}
           onValueChange={(value) => setValues((v) => ({ ...v, price: value }))}
         />
-        {fieldErrors.price && <Field.Error>{fieldErrors.price[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
       <ImageUploadField
@@ -88,27 +88,26 @@ export function BookForm({ id, initialValues }: BookFormProps) {
         aspectRatio={11 / 16}
         value={values.coverImageUrl}
         onValueChange={(url) => setValues((v) => ({ ...v, coverImageUrl: url }))}
-        error={fieldErrors.coverImageUrl?.[0]}
       />
 
-      <Field.Root name="buyUrl" invalid={!!fieldErrors.buyUrl} className="flex flex-col gap-1.5">
+      <Field.Root name="buyUrl" className="flex flex-col gap-1.5">
         <Field.Label>Link "Comprar agora"</Field.Label>
         <Field.Control
           render={<Input type="url" />}
           value={values.buyUrl}
           onValueChange={(value) => setValues((v) => ({ ...v, buyUrl: value }))}
         />
-        {fieldErrors.buyUrl && <Field.Error>{fieldErrors.buyUrl[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="order" invalid={!!fieldErrors.order} className="flex flex-col gap-1.5">
+      <Field.Root name="order" className="flex flex-col gap-1.5">
         <Field.Label>Ordem de exibição</Field.Label>
         <Field.Control
           render={<Input type="number" />}
           value={values.order}
           onValueChange={(value) => setValues((v) => ({ ...v, order: value }))}
         />
-        {fieldErrors.order && <Field.Error>{fieldErrors.order[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
       <Button type="submit" disabled={isPending}>

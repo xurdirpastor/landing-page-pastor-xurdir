@@ -46,18 +46,18 @@ export function AgendaItemForm({ id, initialValues }: AgendaItemFormProps) {
   }
 
   return (
-    <Form onFormSubmit={() => handleSubmit()} className="flex max-w-xl flex-col gap-4">
-      <Field.Root name="title" invalid={!!fieldErrors.title} className="flex flex-col gap-1.5">
+    <Form onFormSubmit={() => handleSubmit()} errors={fieldErrors} className="flex max-w-xl flex-col gap-4">
+      <Field.Root name="title" className="flex flex-col gap-1.5">
         <Field.Label>Título</Field.Label>
         <Field.Control
           render={<Input />}
           value={values.title}
           onValueChange={(value) => setValues((v) => ({ ...v, title: value }))}
         />
-        {fieldErrors.title && <Field.Error>{fieldErrors.title[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="type" invalid={!!fieldErrors.type} className="flex flex-col gap-1.5">
+      <Field.Root name="type" className="flex flex-col gap-1.5">
         <Field.Label>Tipo</Field.Label>
         <Select
           name="type"
@@ -74,37 +74,37 @@ export function AgendaItemForm({ id, initialValues }: AgendaItemFormProps) {
             <SelectItem value="online">Online</SelectItem>
           </SelectContent>
         </Select>
-        {fieldErrors.type && <Field.Error>{fieldErrors.type[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="date" invalid={!!fieldErrors.date} className="flex flex-col gap-1.5">
+      <Field.Root name="date" className="flex flex-col gap-1.5">
         <Field.Label>Data (ordenação e expiração automática, FR-7)</Field.Label>
         <Field.Control
           render={<Input type="date" />}
           value={values.date}
           onValueChange={(value) => setValues((v) => ({ ...v, date: value }))}
         />
-        {fieldErrors.date && <Field.Error>{fieldErrors.date[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="dateLabel" invalid={!!fieldErrors.dateLabel} className="flex flex-col gap-1.5">
+      <Field.Root name="dateLabel" className="flex flex-col gap-1.5">
         <Field.Label>Data exibida (texto livre)</Field.Label>
         <Field.Control
           render={<Input placeholder="Qui, 17 de julho · 19h30" />}
           value={values.dateLabel}
           onValueChange={(value) => setValues((v) => ({ ...v, dateLabel: value }))}
         />
-        {fieldErrors.dateLabel && <Field.Error>{fieldErrors.dateLabel[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="location" invalid={!!fieldErrors.location} className="flex flex-col gap-1.5">
+      <Field.Root name="location" className="flex flex-col gap-1.5">
         <Field.Label>Local</Field.Label>
         <Field.Control
           render={<Input />}
           value={values.location}
           onValueChange={(value) => setValues((v) => ({ ...v, location: value }))}
         />
-        {fieldErrors.location && <Field.Error>{fieldErrors.location[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
       <ImageUploadField
@@ -114,27 +114,26 @@ export function AgendaItemForm({ id, initialValues }: AgendaItemFormProps) {
         aspectRatio={4 / 3}
         value={values.imageUrl}
         onValueChange={(url) => setValues((v) => ({ ...v, imageUrl: url }))}
-        error={fieldErrors.imageUrl?.[0]}
       />
 
-      <Field.Root name="linkUrl" invalid={!!fieldErrors.linkUrl} className="flex flex-col gap-1.5">
+      <Field.Root name="linkUrl" className="flex flex-col gap-1.5">
         <Field.Label>Link "Saiba mais"</Field.Label>
         <Field.Control
           render={<Input type="url" />}
           value={values.linkUrl}
           onValueChange={(value) => setValues((v) => ({ ...v, linkUrl: value }))}
         />
-        {fieldErrors.linkUrl && <Field.Error>{fieldErrors.linkUrl[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
-      <Field.Root name="order" invalid={!!fieldErrors.order} className="flex flex-col gap-1.5">
+      <Field.Root name="order" className="flex flex-col gap-1.5">
         <Field.Label>Ordem de exibição</Field.Label>
         <Field.Control
           render={<Input type="number" />}
           value={String(values.order)}
           onValueChange={(value) => setValues((v) => ({ ...v, order: Number(value) }))}
         />
-        {fieldErrors.order && <Field.Error>{fieldErrors.order[0]}</Field.Error>}
+        <Field.Error />
       </Field.Root>
 
       <Button type="submit" disabled={isPending}>

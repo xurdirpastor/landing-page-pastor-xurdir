@@ -52,7 +52,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
   }
 
   return (
-    <Form onFormSubmit={() => handleSubmit()} className="flex max-w-2xl flex-col gap-6">
+    <Form onFormSubmit={() => handleSubmit()} errors={fieldErrors} className="flex max-w-2xl flex-col gap-6">
       <FormSection title="Hero" description="Primeira coisa que o visitante vê na home.">
         <ImageUploadField
           name="heroPhotoUrl"
@@ -61,37 +61,36 @@ export function AboutForm({ initialValues }: AboutFormProps) {
           aspectRatio={16 / 9}
           value={values.heroPhotoUrl}
           onValueChange={(url) => setValues((v) => ({ ...v, heroPhotoUrl: url }))}
-          error={fieldErrors.heroPhotoUrl?.[0]}
         />
 
-        <Field.Root name="heroHeadline" invalid={!!fieldErrors.heroHeadline} className="flex flex-col gap-1.5">
+        <Field.Root name="heroHeadline" className="flex flex-col gap-1.5">
           <Field.Label>Headline (1ª linha)</Field.Label>
           <Field.Control
             render={<Input />}
             value={values.heroHeadline}
             onValueChange={(value) => setValues((v) => ({ ...v, heroHeadline: value }))}
           />
-          {fieldErrors.heroHeadline && <Field.Error>{fieldErrors.heroHeadline[0]}</Field.Error>}
+          <Field.Error />
         </Field.Root>
 
-        <Field.Root name="heroHighlight" invalid={!!fieldErrors.heroHighlight} className="flex flex-col gap-1.5">
+        <Field.Root name="heroHighlight" className="flex flex-col gap-1.5">
           <Field.Label>Headline manuscrita (2ª linha)</Field.Label>
           <Field.Control
             render={<Input />}
             value={values.heroHighlight}
             onValueChange={(value) => setValues((v) => ({ ...v, heroHighlight: value }))}
           />
-          {fieldErrors.heroHighlight && <Field.Error>{fieldErrors.heroHighlight[0]}</Field.Error>}
+          <Field.Error />
         </Field.Root>
 
-        <Field.Root name="heroIntro" invalid={!!fieldErrors.heroIntro} className="flex flex-col gap-1.5">
+        <Field.Root name="heroIntro" className="flex flex-col gap-1.5">
           <Field.Label>Texto de apresentação</Field.Label>
           <Field.Control
             render={<Textarea rows={4} />}
             value={values.heroIntro}
             onValueChange={(value) => setValues((v) => ({ ...v, heroIntro: value }))}
           />
-          {fieldErrors.heroIntro && <Field.Error>{fieldErrors.heroIntro[0]}</Field.Error>}
+          <Field.Error />
         </Field.Root>
       </FormSection>
 
@@ -103,37 +102,36 @@ export function AboutForm({ initialValues }: AboutFormProps) {
           aspectRatio={4 / 3}
           value={values.familyPhotoUrl}
           onValueChange={(url) => setValues((v) => ({ ...v, familyPhotoUrl: url }))}
-          error={fieldErrors.familyPhotoUrl?.[0]}
         />
 
-        <Field.Root name="aboutEyebrow" invalid={!!fieldErrors.aboutEyebrow} className="flex flex-col gap-1.5">
+        <Field.Root name="aboutEyebrow" className="flex flex-col gap-1.5">
           <Field.Label>Rótulo (eyebrow) de "Uma missão, três frentes"</Field.Label>
           <Field.Control
             render={<Input />}
             value={values.aboutEyebrow}
             onValueChange={(value) => setValues((v) => ({ ...v, aboutEyebrow: value }))}
           />
-          {fieldErrors.aboutEyebrow && <Field.Error>{fieldErrors.aboutEyebrow[0]}</Field.Error>}
+          <Field.Error />
         </Field.Root>
 
-        <Field.Root name="aboutHeading" invalid={!!fieldErrors.aboutHeading} className="flex flex-col gap-1.5">
+        <Field.Root name="aboutHeading" className="flex flex-col gap-1.5">
           <Field.Label>Título da seção</Field.Label>
           <Field.Control
             render={<Input />}
             value={values.aboutHeading}
             onValueChange={(value) => setValues((v) => ({ ...v, aboutHeading: value }))}
           />
-          {fieldErrors.aboutHeading && <Field.Error>{fieldErrors.aboutHeading[0]}</Field.Error>}
+          <Field.Error />
         </Field.Root>
 
-        <Field.Root name="aboutIntro" invalid={!!fieldErrors.aboutIntro} className="flex flex-col gap-1.5">
+        <Field.Root name="aboutIntro" className="flex flex-col gap-1.5">
           <Field.Label>Texto introdutório</Field.Label>
           <Field.Control
             render={<Textarea rows={3} />}
             value={values.aboutIntro}
             onValueChange={(value) => setValues((v) => ({ ...v, aboutIntro: value }))}
           />
-          {fieldErrors.aboutIntro && <Field.Error>{fieldErrors.aboutIntro[0]}</Field.Error>}
+          <Field.Error />
         </Field.Root>
       </FormSection>
 
@@ -145,7 +143,6 @@ export function AboutForm({ initialValues }: AboutFormProps) {
           <fieldset key={pillar.id} className="flex flex-col gap-3 rounded-md border border-border p-4">
             <Field.Root
               name={`pillars.${index}.icon`}
-              invalid={!!fieldErrors[`pillars.${index}.icon`]}
               className="flex flex-col gap-1.5"
             >
               <Field.Label>Ícone</Field.Label>
@@ -167,13 +164,10 @@ export function AboutForm({ initialValues }: AboutFormProps) {
                   ))}
                 </SelectContent>
               </Select>
-              {fieldErrors[`pillars.${index}.icon`] && (
-                <Field.Error>{fieldErrors[`pillars.${index}.icon`][0]}</Field.Error>
-              )}
+              <Field.Error />
             </Field.Root>
             <Field.Root
               name={`pillars.${index}.title`}
-              invalid={!!fieldErrors[`pillars.${index}.title`]}
               className="flex flex-col gap-1.5"
             >
               <Field.Label>Título</Field.Label>
@@ -182,13 +176,10 @@ export function AboutForm({ initialValues }: AboutFormProps) {
                 value={pillar.title}
                 onValueChange={(value) => updatePillar(index, { title: value })}
               />
-              {fieldErrors[`pillars.${index}.title`] && (
-                <Field.Error>{fieldErrors[`pillars.${index}.title`][0]}</Field.Error>
-              )}
+              <Field.Error />
             </Field.Root>
             <Field.Root
               name={`pillars.${index}.description`}
-              invalid={!!fieldErrors[`pillars.${index}.description`]}
               className="flex flex-col gap-1.5"
             >
               <Field.Label>Descrição</Field.Label>
@@ -197,9 +188,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
                 value={pillar.description}
                 onValueChange={(value) => updatePillar(index, { description: value })}
               />
-              {fieldErrors[`pillars.${index}.description`] && (
-                <Field.Error>{fieldErrors[`pillars.${index}.description`][0]}</Field.Error>
-              )}
+              <Field.Error />
             </Field.Root>
           </fieldset>
         ))}
