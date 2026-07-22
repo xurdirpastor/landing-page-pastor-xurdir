@@ -30,13 +30,35 @@ export async function addAdmin(input: unknown): Promise<ActionResult> {
 
   const supabase = createAdminClient()
   const { data, error } = await supabase.auth.admin.inviteUserByEmail(parsed.data.email)
-  if (error) {
-    console.error('inviteUserByEmail failed:', error.message)
-  } else {
+
+  if (!error) {
     await prisma.admin.update({
       where: { id: admin.id },
       data: { supabaseUserId: data.user.id },
     })
+  } else if (error.code === 'email_exists') {
+    // Já existe um usuário Supabase pra esse e-mail (ex.: tentativa de login
+    // própria antes de existir o convite, ou um admin removido e recadastrado)
+    // — inviteUserByEmail não reenvia nada nesse caso. Busca o id existente
+    // direto em auth.users (mesmo Postgres, sem custo de rate limit — chamar
+    // generateLink() aqui e depois signInWithOtp() em seguida bate no
+    // cooldown de 60s do Supabase por contarem como o mesmo envio) e manda o
+    // convite de verdade via signInWithOtp (Magic Link).
+    const existingUser = await prisma.$queryRaw<{ id: string }[]>`
+      SELECT id FROM auth.users WHERE email = ${parsed.data.email} LIMIT 1
+    `
+    if (existingUser[0]) {
+      await prisma.admin.update({
+        where: { id: admin.id },
+        data: { supabaseUserId: existingUser[0].id },
+      })
+    }
+    const { error: otpError } = await supabase.auth.signInWithOtp({ email: parsed.data.email })
+    if (otpError) {
+      console.error('signInWithOtp fallback failed:', otpError.message)
+    }
+  } else {
+    console.error('inviteUserByEmail failed:', error.message)
   }
 
   return { success: true }
