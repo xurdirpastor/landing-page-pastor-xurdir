@@ -73,6 +73,12 @@ Navegação pública, nesta ordem (idêntica ao protótipo): **Sobre · Agenda �
 - FR-25: RBAC simples: todo admin cadastrado tem acesso total ao CRUD de conteúdo (não há, no MVP, permissões granulares por seção entre os 3 admins).
 - FR-26: Qualquer admin logado pode cadastrar um novo admin (e-mail + nome) e remover um admin existente pelo próprio painel — exceto o admin marcado `isSuperAdmin`, cuja remoção é sempre bloqueada (erro explícito, não falha silenciosa). Não há tela de gestão de admin fora do painel (sem depender do dashboard do Supabase para isso).
 
+### 4.9 Header / navbar (adicionado em 2026-07-22, fora da ordem numérica original)
+- FR-27: Exibir nome do ministério (usado no navbar, rodapé e no selo do Hero — um campo só controla os 3 lugares), atalhos de menu no navbar/menu mobile e um botão de CTA fixo (texto + destino) no canto direito do navbar.
+- FR-28: Admin edita o nome do ministério, o texto/destino do CTA do header, e a lista de atalhos do menu — pode adicionar, remover e editar quantos atalhos quiser; o destino de cada atalho (e do CTA) é escolhido via dropdown restrito às âncoras públicas existentes (`#sobre`, `#agenda`, `#video`, `#livros`, `#depoimentos`, `#ofertas`, `#hero`), não texto livre — evita link quebrado apontando pra uma seção que não existe.
+- FR-29: Hero exibe até 2 botões de ação (CTAs), cada um com texto, link (âncora ou URL completa) e tipo (primário/secundário — estilo visual). Admin adiciona/remove (até 2) e edita texto/link/tipo de cada um na tela Hero.
+- FR-30: O selo "Ministério {nome}" no Hero é opcional — admin liga/desliga via toggle (`heroShowBadge`) na tela Hero; o nome usado vem do campo único do Header (FR-27), não é editável separadamente aqui.
+
 ## 5. Design & UI
 
 **O protótipo do Claude Design é a fonte de verdade visual** — qualquer dúvida de cor, espaçamento, tipografia ou componente se resolve olhando `design/design-system-landing-page-pastor.pdf` e `design/landing-pastor-standalone.html`, nunca por estimativa.
@@ -90,7 +96,10 @@ Navegação pública, nesta ordem (idêntica ao protótipo): **Sobre · Agenda �
 
 - **Admin**: `id` (uuid, PK própria — **não** é mais igual ao `auth.users.id` desde o início, ver nota abaixo), `email` (único, chave de negócio), `supabaseUserId` (nullable, preenchido no primeiro login via magic link), `name`, `role` (`admin` | `student`, default `admin` — `student` reservado, sem uso no MVP), `isSuperAdmin` (boolean, default `false` — exatamente 1 linha nasce `true`, via seed, e nunca pode ser removida), `createdAt`.
   > Diferente do desenho original: como o login é por **magic link** e um admin é cadastrado pelo e-mail antes de existir qualquer usuário no Supabase Auth, `Admin.id` não pode nascer igual ao `auth.users.id` (que só existe depois do primeiro acesso). `supabaseUserId` é preenchido nesse momento — até lá, o registro existe só com `email`.
-- **PastorProfile** (singleton): `heroPhotoUrl`, `heroPhotoMobileUrl` (nullable — fallback pra `heroPhotoUrl` quando vazio, adicionado 2026-07-21), `heroHeadline` (1ª linha), `heroHighlight` (2ª linha manuscrita), `heroIntro` (texto), `familyPhotoUrl`, `aboutEyebrow`, `aboutHeading`, `aboutIntro`. Continua 1 tabela só no banco — a separação em "Hero" e "Sobre" é só no admin (§9), não no schema.
+- **PastorProfile** (singleton): `heroPhotoUrl`, `heroPhotoMobileUrl` (nullable — fallback pra `heroPhotoUrl` quando vazio, adicionado 2026-07-21), `heroShowBadge` (boolean, default `true`, adicionado 2026-07-22 — controla o selo "Ministério {nome}" no Hero), `heroHeadline` (1ª linha), `heroHighlight` (2ª linha manuscrita), `heroIntro` (texto), `familyPhotoUrl`, `aboutEyebrow`, `aboutHeading`, `aboutIntro`. Continua 1 tabela só no banco — a separação em "Hero" e "Sobre" é só no admin (§9), não no schema.
+- **HeroCta** (adicionado 2026-07-22): `id`, `label`, `href`, `variant` (`primary` | `secondary`), `order`. Até 2 linhas (limite aplicado no zod/form, não no banco) — os botões de ação do Hero.
+- **HeaderSettings** (singleton, adicionado 2026-07-22): `ministryName` (usado também no rodapé e no selo do Hero — campo único), `ctaLabel`, `ctaHref` (uma das âncoras públicas).
+- **NavLink** (adicionado 2026-07-22): `id`, `label`, `href` (uma das âncoras públicas via dropdown, não texto livre), `order`. Lista aberta — admin adiciona/remove quantos atalhos quiser.
 - **AboutPillar**: `id`, `icon` (slug do ícone), `title`, `description`, `order`.
 - **AgendaItem**: `id`, `title`, `type` (`presencial` | `online`), `date` (DateTime, para ordenação/expiração), `dateLabel` (texto exibido, ex.: "Qui, 17 de julho · 19h30"), `location`, `imageUrl`, `linkUrl`, `order`, `isPublished`, `createdAt`, `updatedAt`.
 - **Book**: `id`, `title`, `subtitle`, `description`, `price` (Decimal), `coverImageUrl`, `buyUrl`, `order`, `isPublished`.
