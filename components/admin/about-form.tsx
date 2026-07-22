@@ -17,11 +17,11 @@ import {
 } from '@/components/ui/select'
 import { ImageUploadField } from '@/components/admin/image-upload-field'
 import { FormSection } from '@/components/admin/form-section'
-import { saveAboutContent } from '@/lib/actions/pastor-profile'
-import type { PastorProfileInput } from '@/lib/schemas/pastor-profile'
+import { saveAboutContent } from '@/lib/actions/about-content'
+import type { AboutContentInput } from '@/lib/schemas/about-content'
 
 type AboutFormProps = {
-  initialValues: PastorProfileInput
+  initialValues: AboutContentInput
 }
 
 const PILLAR_ICON_OPTIONS = ['file-text', 'clock', 'user-plus'] as const
@@ -44,7 +44,7 @@ export function AboutForm({ initialValues }: AboutFormProps) {
     })
   }
 
-  function updatePillar(index: number, patch: Partial<PastorProfileInput['pillars'][number]>) {
+  function updatePillar(index: number, patch: Partial<AboutContentInput['pillars'][number]>) {
     setValues((v) => ({
       ...v,
       pillars: v.pillars.map((pillar, i) => (i === index ? { ...pillar, ...patch } : pillar)),
@@ -53,47 +53,6 @@ export function AboutForm({ initialValues }: AboutFormProps) {
 
   return (
     <Form onFormSubmit={() => handleSubmit()} errors={fieldErrors} className="flex max-w-2xl flex-col gap-6">
-      <FormSection title="Hero" description="Primeira coisa que o visitante vê na home.">
-        <ImageUploadField
-          name="heroPhotoUrl"
-          label="Foto de destaque (hero)"
-          section="profile"
-          aspectRatio={16 / 9}
-          value={values.heroPhotoUrl}
-          onValueChange={(url) => setValues((v) => ({ ...v, heroPhotoUrl: url }))}
-        />
-
-        <Field.Root name="heroHeadline" className="flex flex-col gap-1.5">
-          <Field.Label>Headline (1ª linha)</Field.Label>
-          <Field.Control
-            render={<Input />}
-            value={values.heroHeadline}
-            onValueChange={(value) => setValues((v) => ({ ...v, heroHeadline: value }))}
-          />
-          <Field.Error />
-        </Field.Root>
-
-        <Field.Root name="heroHighlight" className="flex flex-col gap-1.5">
-          <Field.Label>Headline manuscrita (2ª linha)</Field.Label>
-          <Field.Control
-            render={<Input />}
-            value={values.heroHighlight}
-            onValueChange={(value) => setValues((v) => ({ ...v, heroHighlight: value }))}
-          />
-          <Field.Error />
-        </Field.Root>
-
-        <Field.Root name="heroIntro" className="flex flex-col gap-1.5">
-          <Field.Label>Texto de apresentação</Field.Label>
-          <Field.Control
-            render={<Textarea rows={4} />}
-            value={values.heroIntro}
-            onValueChange={(value) => setValues((v) => ({ ...v, heroIntro: value }))}
-          />
-          <Field.Error />
-        </Field.Root>
-      </FormSection>
-
       <FormSection title="Seção Sobre" description="Foto da família e texto de 'Uma missão, três frentes'.">
         <ImageUploadField
           name="familyPhotoUrl"

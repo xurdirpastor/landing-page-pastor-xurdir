@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 
 const sections = [
-  { href: '/admin/sobre', title: 'Sobre', description: 'Foto, headline e os 3 pilares da apresentação.' },
+  { href: '/admin/hero', title: 'Hero', description: 'Primeira coisa que o visitante vê na home.' },
+  { href: '/admin/sobre', title: 'Sobre', description: 'Foto da família e os 3 pilares da apresentação.' },
   { href: '/admin/agenda', title: 'Agenda', description: 'Cultos, mentorias e pregações.' },
   { href: '/admin/livros', title: 'Livros', description: 'Livros publicados e links de compra.' },
   { href: '/admin/video', title: 'Vídeo em destaque', description: 'O vídeo exibido na home.' },
