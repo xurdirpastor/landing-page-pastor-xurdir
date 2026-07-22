@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Card } from '@/components/ui/card'
 
 const sections = [
+  { href: '/admin/header', title: 'Header', description: 'Nome do ministério, atalhos do menu e CTA.' },
   { href: '/admin/hero', title: 'Hero', description: 'Primeira coisa que o visitante vê na home.' },
   { href: '/admin/sobre', title: 'Sobre', description: 'Foto da família e os 3 pilares da apresentação.' },
   { href: '/admin/agenda', title: 'Agenda', description: 'Cultos, mentorias e pregações.' },

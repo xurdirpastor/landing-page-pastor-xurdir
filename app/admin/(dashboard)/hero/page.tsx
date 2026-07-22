@@ -2,7 +2,10 @@ import { prisma } from '@/lib/prisma'
 import { HeroForm } from '@/components/admin/hero-form'
 
 export default async function HeroAdminPage() {
-  const profile = await prisma.pastorProfile.findUniqueOrThrow({ where: { id: 'singleton' } })
+  const [profile, ctas] = await Promise.all([
+    prisma.pastorProfile.findUniqueOrThrow({ where: { id: 'singleton' } }),
+    prisma.heroCta.findMany({ orderBy: { order: 'asc' } }),
+  ])
 
   return (
     <div className="flex flex-col gap-6">
@@ -16,9 +19,16 @@ export default async function HeroAdminPage() {
         initialValues={{
           heroPhotoUrl: profile.heroPhotoUrl,
           heroPhotoMobileUrl: profile.heroPhotoMobileUrl ?? '',
+          heroShowBadge: profile.heroShowBadge,
           heroHeadline: profile.heroHeadline,
           heroHighlight: profile.heroHighlight,
           heroIntro: profile.heroIntro,
+          ctas: ctas.map((cta) => ({
+            id: cta.id,
+            label: cta.label,
+            href: cta.href,
+            variant: cta.variant,
+          })),
         }}
       />
     </div>
