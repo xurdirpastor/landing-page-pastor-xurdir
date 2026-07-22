@@ -22,8 +22,8 @@ const caveat = Caveat({
 });
 
 export const metadata: Metadata = {
-  title: "Seja Livre",
-  description: "Ministério Seja Livre — Pastor Xurdir",
+  title: "Pastor Xurdir",
+  description: "Ministério Pastor Xurdir",
 };
 
 export default function RootLayout({
