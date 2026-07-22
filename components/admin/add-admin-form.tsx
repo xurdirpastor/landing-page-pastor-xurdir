@@ -25,7 +25,7 @@ export function AddAdminForm() {
       }
       setValues({ email: '', name: '' })
       setFieldErrors({})
-      toast.success('Admin adicionado com sucesso.')
+      toast.success('Admin adicionado — convite enviado por e-mail.')
       router.refresh()
     })
   }
@@ -50,7 +50,7 @@ export function AddAdminForm() {
         />
         <Field.Error />
       </Field.Root>
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" disabled={isPending} className="h-11">
         {isPending && <LuLoaderCircle className="size-4 animate-spin" />}
         {isPending ? 'Adicionando...' : 'Adicionar admin'}
       </Button>

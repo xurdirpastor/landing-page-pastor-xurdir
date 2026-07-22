@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAdmin } from '@/lib/require-admin'
 import { canRemoveAdmin } from '@/lib/dal'
 import { addAdminSchema } from '@/lib/schemas/admin'
+import { createAdminClient } from '@/lib/supabase/admin'
 import {
   zodIssuesToFieldErrors,
   type ActionResult,
@@ -23,7 +24,21 @@ export async function addAdmin(input: unknown): Promise<ActionResult> {
     return { success: false, fieldErrors: { email: ['Esse e-mail já está cadastrado como admin.'] } }
   }
 
-  await prisma.admin.create({ data: { email: parsed.data.email, name: parsed.data.name } })
+  const admin = await prisma.admin.create({
+    data: { email: parsed.data.email, name: parsed.data.name },
+  })
+
+  const supabase = createAdminClient()
+  const { data, error } = await supabase.auth.admin.inviteUserByEmail(parsed.data.email)
+  if (error) {
+    console.error('inviteUserByEmail failed:', error.message)
+  } else {
+    await prisma.admin.update({
+      where: { id: admin.id },
+      data: { supabaseUserId: data.user.id },
+    })
+  }
+
   return { success: true }
 }
 
