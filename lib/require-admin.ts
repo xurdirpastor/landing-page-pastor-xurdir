@@ -33,7 +33,12 @@ export const requireAdmin = cache(async () => {
     redirect('/admin/login')
   }
   if (result.status === 'forbidden') {
-    redirect('/?deniedAccess=1')
+    // Sessão do Supabase ainda válida, mas o admin foi removido da tabela —
+    // precisa encerrar a sessão de verdade (não só bloquear o acesso), senão
+    // o cookie fica preso e a pessoa nunca mais consegue ver a tela de login
+    // de novo (ver app/admin/access-denied/route.ts pro porquê disso não
+    // pode acontecer aqui direto, dentro de um Server Component).
+    redirect('/admin/access-denied')
   }
 
   return result.admin
