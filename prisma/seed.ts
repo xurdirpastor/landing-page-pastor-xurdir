@@ -31,6 +31,37 @@ async function main() {
     },
   })
 
+  await prisma.headerSettings.upsert({
+    where: { id: 'singleton' },
+    update: {},
+    create: {
+      id: 'singleton',
+      ministryName: 'Seja Livre',
+      ctaLabel: 'Fale Conosco',
+      ctaHref: '#agenda',
+    },
+  })
+
+  await prisma.navLink.deleteMany()
+  await prisma.navLink.createMany({
+    data: [
+      { label: 'Sobre', href: '#sobre', order: 0 },
+      { label: 'Agenda', href: '#agenda', order: 1 },
+      { label: 'Palavra', href: '#video', order: 2 },
+      { label: 'Livros', href: '#livros', order: 3 },
+      { label: 'Depoimentos', href: '#depoimentos', order: 4 },
+      { label: 'Ofertas', href: '#ofertas', order: 5 },
+    ],
+  })
+
+  await prisma.heroCta.deleteMany()
+  await prisma.heroCta.createMany({
+    data: [
+      { label: 'Assista à última pregação', href: '#video', variant: 'primary', order: 0 },
+      { label: 'Ver agenda completa', href: '#agenda', variant: 'secondary', order: 1 },
+    ],
+  })
+
   await prisma.aboutPillar.deleteMany()
   await prisma.aboutPillar.createMany({
     data: [
