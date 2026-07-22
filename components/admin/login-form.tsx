@@ -50,7 +50,7 @@ export function LoginForm() {
         />
         <Field.Error />
       </Field.Root>
-      <Button type="submit" disabled={isPending || email.length === 0}>
+      <Button type="submit" disabled={isPending || email.length === 0} className="h-11">
         {isPending && <LuLoaderCircle className="size-4 animate-spin" />}
         {isPending ? 'Enviando...' : 'Enviar link de acesso'}
       </Button>

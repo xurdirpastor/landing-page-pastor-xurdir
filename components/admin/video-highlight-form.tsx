@@ -66,7 +66,7 @@ export function VideoHighlightForm({ initialValues }: VideoHighlightFormProps) {
           <Field.Error />
         </Field.Root>
       ))}
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" disabled={isPending} className="h-11">
         {isPending && <LuLoaderCircle className="size-4 animate-spin" />}
         {isPending ? 'Salvando...' : 'Salvar'}
       </Button>
