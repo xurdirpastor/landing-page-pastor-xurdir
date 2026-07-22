@@ -20,7 +20,7 @@ export default async function HeaderAdminPage() {
         initialValues={{
           ministryName: settings.ministryName,
           ctaLabel: settings.ctaLabel,
-          ctaHref: settings.ctaHref as SiteAnchor,
+          ctaHref: settings.ctaHref,
           navLinks: navLinks.map((link) => ({
             id: link.id,
             label: link.label,

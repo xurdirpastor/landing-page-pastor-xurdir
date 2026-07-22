@@ -1,12 +1,5 @@
 import { z } from 'zod'
-
-const ctaHrefSchema = z
-  .string()
-  .min(1, 'Obrigatório')
-  .refine(
-    (val) => val.startsWith('#') || /^https?:\/\//.test(val),
-    'Use uma âncora (ex.: #agenda) ou um link completo (https://...)'
-  )
+import { linkSchema } from '@/lib/schemas/link'
 
 export const heroSchema = z.object({
   heroPhotoUrl: z.string().url('Envie uma foto'),
@@ -20,7 +13,7 @@ export const heroSchema = z.object({
       z.object({
         id: z.string(),
         label: z.string().min(1, 'Obrigatório'),
-        href: ctaHrefSchema,
+        href: linkSchema,
         variant: z.enum(['primary', 'secondary']),
       })
     )

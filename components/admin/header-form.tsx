@@ -85,25 +85,12 @@ export function HeaderForm({ initialValues }: HeaderFormProps) {
         </Field.Root>
 
         <Field.Root name="ctaHref" className="flex flex-col gap-1.5">
-          <Field.Label>Destino</Field.Label>
-          <Select
-            name="ctaHref"
+          <Field.Label>Link (ex.: #agenda ou https://...)</Field.Label>
+          <Field.Control
+            render={<Input />}
             value={values.ctaHref}
-            onValueChange={(value) => {
-              if (value) setValues((v) => ({ ...v, ctaHref: value as HeaderInput['ctaHref'] }))
-            }}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione" />
-            </SelectTrigger>
-            <SelectContent>
-              {SITE_ANCHOR_VALUES.map((anchor) => (
-                <SelectItem key={anchor} value={anchor}>
-                  {SITE_ANCHOR_LABELS[anchor]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            onValueChange={(value) => setValues((v) => ({ ...v, ctaHref: value }))}
+          />
           <Field.Error />
         </Field.Root>
       </FormSection>
@@ -143,7 +130,7 @@ export function HeaderForm({ initialValues }: HeaderFormProps) {
                 name={`navLinks.${index}.href`}
                 value={link.href}
                 onValueChange={(value) => {
-                  if (value) updateNavLink(index, { href: value as HeaderInput['ctaHref'] })
+                  if (value) updateNavLink(index, { href: value as HeaderInput['navLinks'][number]['href'] })
                 }}
               >
                 <SelectTrigger>
@@ -168,7 +155,7 @@ export function HeaderForm({ initialValues }: HeaderFormProps) {
         </Button>
       </FormSection>
 
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" disabled={isPending} className="h-11">
         {isPending && <LuLoaderCircle className="size-4 animate-spin" />}
         {isPending ? 'Salvando...' : 'Salvar'}
       </Button>

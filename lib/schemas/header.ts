@@ -1,10 +1,11 @@
 import { z } from 'zod'
 import { SITE_ANCHOR_VALUES } from '@/lib/constants/site-anchors'
+import { linkSchema } from '@/lib/schemas/link'
 
 export const headerSchema = z.object({
   ministryName: z.string().min(1, 'Obrigatório'),
   ctaLabel: z.string().min(1, 'Obrigatório'),
-  ctaHref: z.enum(SITE_ANCHOR_VALUES),
+  ctaHref: linkSchema,
   navLinks: z
     .array(
       z.object({
