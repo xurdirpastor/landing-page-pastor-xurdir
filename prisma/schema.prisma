@@ -28,6 +28,11 @@ enum PixKeyType {
   random
 }
 
+enum CtaVariant {
+  primary
+  secondary
+}
+
 model Admin {
   id             String   @id @default(uuid())
   email          String   @unique
@@ -39,16 +44,39 @@ model Admin {
 }
 
 model PastorProfile {
-  id                String  @id @default("singleton")
-  heroPhotoUrl      String
+  id                 String  @id @default("singleton")
+  heroPhotoUrl       String
   heroPhotoMobileUrl String?
-  heroHeadline      String
-  heroHighlight     String
-  heroIntro         String
-  familyPhotoUrl    String
-  aboutEyebrow      String
-  aboutHeading      String
-  aboutIntro        String
+  heroShowBadge      Boolean @default(true)
+  heroHeadline       String
+  heroHighlight      String
+  heroIntro          String
+  familyPhotoUrl     String
+  aboutEyebrow       String
+  aboutHeading       String
+  aboutIntro         String
+}
+
+model HeroCta {
+  id      String     @id @default(uuid())
+  label   String
+  href    String
+  variant CtaVariant
+  order   Int
+}
+
+model HeaderSettings {
+  id           String @id @default("singleton")
+  ministryName String
+  ctaLabel     String
+  ctaHref      String
+}
+
+model NavLink {
+  id    String @id @default(uuid())
+  label String
+  href  String
+  order Int
 }
 
 model AboutPillar {
