@@ -149,6 +149,7 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
   ::selection {
     background: var(--primary);
