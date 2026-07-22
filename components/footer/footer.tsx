@@ -9,7 +9,12 @@ const NAV_LINKS = [
   { label: 'Ofertas', href: '#ofertas' },
 ]
 
-export function Footer({ settings }: { settings: FooterSettings }) {
+type FooterProps = {
+  settings: FooterSettings
+  ministryName: string
+}
+
+export function Footer({ settings, ministryName }: FooterProps) {
   return (
     <footer className="bg-popover">
       <div className="divider-glow" />
@@ -18,10 +23,12 @@ export function Footer({ settings }: { settings: FooterSettings }) {
           <div>
             <div className="flex items-center gap-2">
               <LogoMark logoUrl={settings.logoUrl} />
-              <span className="font-heading text-lg font-semibold text-foreground">Seja Livre</span>
+              <span className="font-heading text-lg font-semibold text-foreground">
+                {ministryName}
+              </span>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
-              Ministério Seja Livre — CNPJ {settings.cnpj}
+              Ministério {ministryName} — CNPJ {settings.cnpj}
             </p>
             <p className="mt-2 text-sm text-muted-foreground">{settings.address}</p>
           </div>

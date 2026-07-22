@@ -12,9 +12,16 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 
-type NavItem = { label: string; href: string }
+type NavItem = { id: string; label: string; href: string }
 
-export function MobileMenu({ items }: { items: NavItem[] }) {
+type MobileMenuProps = {
+  items: NavItem[]
+  ministryName: string
+  ctaLabel: string
+  ctaHref: string
+}
+
+export function MobileMenu({ items, ministryName, ctaLabel, ctaHref }: MobileMenuProps) {
   return (
     <Sheet>
       <SheetTrigger
@@ -25,12 +32,12 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
       </SheetTrigger>
       <SheetContent side="right">
         <SheetHeader>
-          <SheetTitle>Seja Livre</SheetTitle>
+          <SheetTitle>{ministryName}</SheetTitle>
         </SheetHeader>
         <nav className="flex flex-col gap-1 px-4">
           {items.map((item) => (
             <SheetClose
-              key={item.href}
+              key={item.id}
               render={<a href={item.href} />}
               nativeButton={false}
               className="rounded-md px-3 py-3 text-base font-medium text-foreground hover:bg-muted"
@@ -41,11 +48,11 @@ export function MobileMenu({ items }: { items: NavItem[] }) {
         </nav>
         <div className="mt-auto p-4">
           <SheetClose
-            render={<a href="#agenda" />}
+            render={<a href={ctaHref} />}
             nativeButton={false}
             className={cn(buttonVariants(), 'h-11 w-full rounded-full text-[15px] font-bold')}
           >
-            Fale Conosco
+            {ctaLabel}
           </SheetClose>
         </div>
       </SheetContent>

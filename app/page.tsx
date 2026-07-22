@@ -7,7 +7,8 @@ import { BooksSection } from '@/components/books/books-section'
 import { TestimonialsSection } from '@/components/testimonials/testimonials-section'
 import { OfferingsSection } from '@/components/offerings/offerings-section'
 import { Footer } from '@/components/footer/footer'
-import { getPastorProfile, getAboutPillars } from '@/lib/content/about'
+import { getPastorProfile, getAboutPillars, getHeroCtas } from '@/lib/content/about'
+import { getHeaderSettings, getNavLinks } from '@/lib/content/header'
 import { getAgendaItems } from '@/lib/content/agenda'
 import { getBooks } from '@/lib/content/books'
 import { getVideoHighlight } from '@/lib/content/video'
@@ -16,23 +17,37 @@ import { getOfferingSettings } from '@/lib/content/offerings'
 import { getFooterSettings } from '@/lib/content/footer'
 
 export default async function Home() {
-  const [profile, pillars, agendaItems, books, video, testimonials, offerings, footer] =
-    await Promise.all([
-      getPastorProfile(),
-      getAboutPillars(),
-      getAgendaItems(),
-      getBooks(),
-      getVideoHighlight(),
-      getTestimonials(),
-      getOfferingSettings(),
-      getFooterSettings(),
-    ])
+  const [
+    profile,
+    pillars,
+    heroCtas,
+    header,
+    navLinks,
+    agendaItems,
+    books,
+    video,
+    testimonials,
+    offerings,
+    footer,
+  ] = await Promise.all([
+    getPastorProfile(),
+    getAboutPillars(),
+    getHeroCtas(),
+    getHeaderSettings(),
+    getNavLinks(),
+    getAgendaItems(),
+    getBooks(),
+    getVideoHighlight(),
+    getTestimonials(),
+    getOfferingSettings(),
+    getFooterSettings(),
+  ])
 
   return (
     <>
-      <Navbar logoUrl={footer.logoUrl} />
+      <Navbar logoUrl={footer.logoUrl} settings={header} navLinks={navLinks} />
       <main>
-        <HeroSection profile={profile} />
+        <HeroSection profile={profile} ministryName={header.ministryName} ctas={heroCtas} />
         <AboutSection profile={profile} pillars={pillars} />
         <AgendaSection items={agendaItems} />
         <VideoSection video={video} />
@@ -40,7 +55,7 @@ export default async function Home() {
         <TestimonialsSection testimonials={testimonials} />
         <OfferingsSection settings={offerings} />
       </main>
-      <Footer settings={footer} />
+      <Footer settings={footer} ministryName={header.ministryName} />
     </>
   )
 }
