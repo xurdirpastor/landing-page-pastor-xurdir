@@ -14,12 +14,23 @@ export async function saveHeroContent(input: unknown): Promise<ActionResult> {
     return { success: false, fieldErrors: zodIssuesToFieldErrors(parsed.error) }
   }
 
-  const { heroPhotoMobileUrl, ...hero } = parsed.data
+  const { heroPhotoMobileUrl, ctas, ...hero } = parsed.data
 
-  await prisma.pastorProfile.update({
-    where: { id: 'singleton' },
-    data: { ...hero, heroPhotoMobileUrl: heroPhotoMobileUrl || null },
-  })
+  await prisma.$transaction([
+    prisma.pastorProfile.update({
+      where: { id: 'singleton' },
+      data: { ...hero, heroPhotoMobileUrl: heroPhotoMobileUrl || null },
+    }),
+    prisma.heroCta.deleteMany(),
+    prisma.heroCta.createMany({
+      data: ctas.map((cta, index) => ({
+        label: cta.label,
+        href: cta.href,
+        variant: cta.variant,
+        order: index,
+      })),
+    }),
+  ])
 
   revalidateTag('about', { expire: 0 })
   return { success: true }
