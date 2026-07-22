@@ -39,15 +39,16 @@ model Admin {
 }
 
 model PastorProfile {
-  id             String @id @default("singleton")
-  heroPhotoUrl   String
-  heroHeadline   String
-  heroHighlight  String
-  heroIntro      String
-  familyPhotoUrl String
-  aboutEyebrow   String
-  aboutHeading   String
-  aboutIntro     String
+  id                String  @id @default("singleton")
+  heroPhotoUrl      String
+  heroPhotoMobileUrl String?
+  heroHeadline      String
+  heroHighlight     String
+  heroIntro         String
+  familyPhotoUrl    String
+  aboutEyebrow      String
+  aboutHeading      String
+  aboutIntro        String
 }
 
 model AboutPillar {
