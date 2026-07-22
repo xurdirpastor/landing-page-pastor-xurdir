@@ -1,18 +1,21 @@
-import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import type { PastorProfile } from '@/lib/generated/prisma/client'
 
 export function HeroSection({ profile }: { profile: PastorProfile }) {
   return (
     <section id="hero" className="relative flex min-h-[640px] items-center overflow-hidden">
-      <Image
-        src={profile.heroPhotoUrl}
-        alt="Pastor Xurdir"
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover"
-      />
+      <picture className="contents">
+        {profile.heroPhotoMobileUrl && (
+          <source media="(max-width: 859px)" srcSet={profile.heroPhotoMobileUrl} />
+        )}
+        <img
+          src={profile.heroPhotoUrl}
+          alt="Pastor Xurdir"
+          fetchPriority="high"
+          loading="eager"
+          className="absolute inset-0 size-full object-cover"
+        />
+      </picture>
       <div className="absolute inset-0 bg-gradient-to-r from-black/90 from-0% via-black/60 via-65% to-transparent" />
 
       <div className="relative mx-auto w-full max-w-6xl px-6 py-24">
