@@ -1,8 +1,8 @@
 type LogoMarkSize = 'nav' | 'footer'
 
 const IMAGE_HEIGHT_CLASS: Record<LogoMarkSize, string> = {
-  nav: 'h-9',
-  footer: 'h-12',
+  nav: 'max-h-9',
+  footer: 'max-h-12',
 }
 
 const FALLBACK_SIZE_CLASS: Record<LogoMarkSize, string> = {
@@ -22,7 +22,7 @@ export function LogoMark({
       <img
         src={logoUrl}
         alt="Seja Livre"
-        className={`w-auto shrink-0 object-contain ${IMAGE_HEIGHT_CLASS[size]}`}
+        className={`w-auto max-w-full object-contain ${IMAGE_HEIGHT_CLASS[size]}`}
       />
     )
   }

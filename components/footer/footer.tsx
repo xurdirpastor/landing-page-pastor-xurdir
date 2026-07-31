@@ -20,8 +20,8 @@ export function Footer({ settings, ministryName }: FooterProps) {
       <div className="divider-glow" />
       <div className="mx-auto max-w-6xl px-6 py-16">
         <div className="grid gap-10 nav:grid-cols-3">
-          <div>
-            <div className="flex items-center gap-2">
+          <div className="min-w-0">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               <LogoMark logoUrl={settings.logoUrl} size="footer" />
               {settings.showLogoText && (
                 <span className="font-heading text-lg font-semibold text-foreground">
