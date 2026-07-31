@@ -18,6 +18,7 @@ export default async function HeaderAdminPage() {
       </div>
       <HeaderForm
         initialValues={{
+          logoUrl: settings.logoUrl ?? '',
           ministryName: settings.ministryName,
           ctaLabel: settings.ctaLabel,
           ctaHref: settings.ctaHref,

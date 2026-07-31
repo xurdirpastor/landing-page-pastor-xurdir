@@ -12,9 +12,12 @@ const NAV_LINKS = [
 type FooterProps = {
   settings: FooterSettings
   ministryName: string
+  headerLogoUrl?: string | null
 }
 
-export function Footer({ settings, ministryName }: FooterProps) {
+export function Footer({ settings, ministryName, headerLogoUrl }: FooterProps) {
+  const logoUrl = settings.logoUrl || headerLogoUrl
+
   return (
     <footer className="bg-popover">
       <div className="divider-glow" />
@@ -22,16 +25,14 @@ export function Footer({ settings, ministryName }: FooterProps) {
         <div className="grid gap-10 nav:grid-cols-3">
           <div className="min-w-0">
             <div className="flex min-w-0 flex-wrap items-center gap-2">
-              <LogoMark logoUrl={settings.logoUrl} size="footer" />
+              <LogoMark logoUrl={logoUrl} size="footer" />
               {settings.showLogoText && (
                 <span className="font-heading text-lg font-semibold text-foreground">
                   {ministryName}
                 </span>
               )}
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">
-              Ministério {ministryName} — CNPJ {settings.cnpj}
-            </p>
+            <p className="mt-4 text-sm text-muted-foreground">{settings.institutionalText}</p>
             <p className="mt-2 text-sm text-muted-foreground">{settings.address}</p>
           </div>
 

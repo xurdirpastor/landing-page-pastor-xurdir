@@ -15,9 +15,16 @@ import type { FooterSettingsInput } from '@/lib/schemas/footer-settings'
 
 type FooterSettingsFormProps = { initialValues: FooterSettingsInput }
 
-type TextFieldKey = 'cnpj' | 'address' | 'instagramUrl' | 'youtubeUrl' | 'whatsappUrl'
+type TextFieldKey =
+  | 'institutionalText'
+  | 'cnpj'
+  | 'address'
+  | 'instagramUrl'
+  | 'youtubeUrl'
+  | 'whatsappUrl'
 
 const institutionalFields: Array<{ key: TextFieldKey; label: string }> = [
+  { key: 'institutionalText', label: 'Texto institucional (linha exibida no rodapé)' },
   { key: 'cnpj', label: 'CNPJ' },
   { key: 'address', label: 'Endereço' },
 ]
@@ -62,10 +69,10 @@ export function FooterSettingsForm({ initialValues }: FooterSettingsFormProps) {
 
   return (
     <Form onFormSubmit={() => handleSubmit()} errors={fieldErrors} className="flex max-w-xl flex-col gap-6">
-      <FormSection title="Logo">
+      <FormSection title="Logo" description="Se vazio, usa a logo do cabeçalho.">
         <ImageUploadField
           name="logoUrl"
-          label="Logo do site (usado no cabeçalho e no rodapé)"
+          label="Logo do rodapé"
           section="profile"
           value={values.logoUrl}
           onValueChange={(url) => setValues((v) => ({ ...v, logoUrl: url }))}

@@ -66,7 +66,8 @@ model HeroCta {
 }
 
 model HeaderSettings {
-  id           String @id @default("singleton")
+  id           String  @id @default("singleton")
+  logoUrl      String?
   ministryName String
   ctaLabel     String
   ctaHref      String
@@ -153,13 +154,14 @@ model OfferingSettings {
 }
 
 model FooterSettings {
-  id            String  @id @default("singleton")
-  logoUrl       String?
-  showLogoText  Boolean @default(true)
-  cnpj          String
-  address       String
-  instagramUrl  String
-  youtubeUrl    String
-  whatsappUrl   String
-  copyrightText String
+  id                String  @id @default("singleton")
+  logoUrl           String?
+  showLogoText      Boolean @default(true)
+  institutionalText String  @default("")
+  cnpj              String
+  address           String
+  instagramUrl      String
+  youtubeUrl        String
+  whatsappUrl       String
+  copyrightText     String
 }

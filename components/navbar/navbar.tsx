@@ -4,18 +4,17 @@ import { MobileMenu } from './mobile-menu'
 import type { HeaderSettings, NavLink } from '@/lib/generated/prisma/client'
 
 type NavbarProps = {
-  logoUrl?: string | null
   showLogoText?: boolean
   settings: HeaderSettings
   navLinks: NavLink[]
 }
 
-export function Navbar({ logoUrl, showLogoText = true, settings, navLinks }: NavbarProps) {
+export function Navbar({ showLogoText = true, settings, navLinks }: NavbarProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
         <a href="#hero" className="flex items-center gap-2">
-          <LogoMark logoUrl={logoUrl} />
+          <LogoMark logoUrl={settings.logoUrl} />
           {showLogoText && (
             <span className="font-heading text-lg font-semibold text-foreground">
               {settings.ministryName}

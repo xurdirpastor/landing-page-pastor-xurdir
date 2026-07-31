@@ -16,6 +16,7 @@ export default async function FooterAdminPage() {
         initialValues={{
           logoUrl: settings.logoUrl ?? '',
           showLogoText: settings.showLogoText,
+          institutionalText: settings.institutionalText,
           cnpj: settings.cnpj,
           address: settings.address,
           instagramUrl: settings.instagramUrl,

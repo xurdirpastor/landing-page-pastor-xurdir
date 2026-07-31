@@ -45,12 +45,7 @@ export default async function Home() {
 
   return (
     <>
-      <Navbar
-        logoUrl={footer.logoUrl}
-        showLogoText={footer.showLogoText}
-        settings={header}
-        navLinks={navLinks}
-      />
+      <Navbar showLogoText={footer.showLogoText} settings={header} navLinks={navLinks} />
       <main>
         <HeroSection profile={profile} ministryName={header.ministryName} ctas={heroCtas} />
         <AboutSection profile={profile} pillars={pillars} />
@@ -60,7 +55,7 @@ export default async function Home() {
         <TestimonialsSection testimonials={testimonials} />
         <OfferingsSection settings={offerings} />
       </main>
-      <Footer settings={footer} ministryName={header.ministryName} />
+      <Footer settings={footer} ministryName={header.ministryName} headerLogoUrl={header.logoUrl} />
     </>
   )
 }

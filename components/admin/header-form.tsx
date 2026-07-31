@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { FormSection } from '@/components/admin/form-section'
+import { ImageUploadField } from '@/components/admin/image-upload-field'
 import { saveHeaderSettings } from '@/lib/actions/header'
 import type { HeaderInput } from '@/lib/schemas/header'
 import { SITE_ANCHOR_VALUES, SITE_ANCHOR_LABELS } from '@/lib/constants/site-anchors'
@@ -61,6 +62,16 @@ export function HeaderForm({ initialValues }: HeaderFormProps) {
 
   return (
     <Form onFormSubmit={() => handleSubmit()} errors={fieldErrors} className="flex max-w-2xl flex-col gap-6">
+      <FormSection title="Logo" description="Logo exibida no navbar.">
+        <ImageUploadField
+          name="logoUrl"
+          label="Logo do cabeçalho"
+          section="header"
+          value={values.logoUrl}
+          onValueChange={(url) => setValues((v) => ({ ...v, logoUrl: url }))}
+        />
+      </FormSection>
+
       <FormSection title="Identidade" description="Nome usado no navbar, rodapé e selo do Hero.">
         <Field.Root name="ministryName" className="flex flex-col gap-1.5">
           <Field.Label>Nome do ministério</Field.Label>

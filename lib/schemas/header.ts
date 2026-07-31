@@ -3,6 +3,7 @@ import { SITE_ANCHOR_VALUES } from '@/lib/constants/site-anchors'
 import { linkSchema } from '@/lib/schemas/link'
 
 export const headerSchema = z.object({
+  logoUrl: z.union([z.string().url(), z.literal('')]),
   ministryName: z.string().min(1, 'Obrigatório'),
   ctaLabel: z.string().min(1, 'Obrigatório'),
   ctaHref: linkSchema,
