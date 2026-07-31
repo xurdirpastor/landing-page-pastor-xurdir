@@ -32,8 +32,11 @@ export function Footer({ settings, ministryName, headerLogoUrl }: FooterProps) {
                 </span>
               )}
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">{settings.institutionalText}</p>
-            <p className="mt-2 text-sm text-muted-foreground">{settings.address}</p>
+            <div className="mt-4 flex flex-col gap-2 text-sm text-muted-foreground">
+              {settings.institutionalText && <p>{settings.institutionalText}</p>}
+              {settings.cnpj && <p>CNPJ {settings.cnpj}</p>}
+              {settings.address && <p>{settings.address}</p>}
+            </div>
           </div>
 
           <div>
