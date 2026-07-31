@@ -22,10 +22,12 @@ export function Footer({ settings, ministryName }: FooterProps) {
         <div className="grid gap-10 nav:grid-cols-3">
           <div>
             <div className="flex items-center gap-2">
-              <LogoMark logoUrl={settings.logoUrl} />
-              <span className="font-heading text-lg font-semibold text-foreground">
-                {ministryName}
-              </span>
+              <LogoMark logoUrl={settings.logoUrl} size="footer" />
+              {settings.showLogoText && (
+                <span className="font-heading text-lg font-semibold text-foreground">
+                  {ministryName}
+                </span>
+              )}
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
               Ministério {ministryName} — CNPJ {settings.cnpj}
