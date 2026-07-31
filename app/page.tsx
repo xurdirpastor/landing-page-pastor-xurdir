@@ -45,7 +45,12 @@ export default async function Home() {
 
   return (
     <>
-      <Navbar logoUrl={footer.logoUrl} settings={header} navLinks={navLinks} />
+      <Navbar
+        logoUrl={footer.logoUrl}
+        showLogoText={footer.showLogoText}
+        settings={header}
+        navLinks={navLinks}
+      />
       <main>
         <HeroSection profile={profile} ministryName={header.ministryName} ctas={heroCtas} />
         <AboutSection profile={profile} pillars={pillars} />
