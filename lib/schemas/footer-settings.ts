@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 export const footerSettingsSchema = z.object({
   logoUrl: z.union([z.string().url(), z.literal('')]),
+  showLogoText: z.boolean(),
   cnpj: z.string().min(1, 'Obrigatório'),
   address: z.string().min(1, 'Obrigatório'),
   instagramUrl: z.string().url('URL inválida'),
