@@ -23,7 +23,7 @@ type ImageUploadFieldProps = {
   name: string
   label: string
   section: string
-  aspectRatio: number
+  aspectRatio?: number
   value: string
   onValueChange: (url: string) => void
 }
@@ -67,6 +67,30 @@ export function ImageUploadField({
     setPendingSource(source)
   }
 
+  async function uploadToStorage(blob: Blob, filename: string): Promise<boolean> {
+    setIsUploading(true)
+    try {
+      const supabase = createClient()
+      const path = buildUploadPath(section, filename, crypto.randomUUID())
+      const { error: uploadErr } = await supabase.storage
+        .from('media')
+        .upload(path, blob, { contentType: blob.type })
+
+      if (uploadErr) {
+        setUploadError(`Falha no upload: ${uploadErr.message}`)
+        toast.error('Falha ao enviar a imagem.')
+        return false
+      }
+
+      const { data } = supabase.storage.from('media').getPublicUrl(path)
+      onValueChange(data.publicUrl)
+      toast.success('Imagem enviada com sucesso.')
+      return true
+    } finally {
+      setIsUploading(false)
+    }
+  }
+
   function handleFile(file: File) {
     if (!file.type.startsWith('image/')) {
       setUploadError('Selecione um arquivo de imagem.')
@@ -77,11 +101,16 @@ export function ImageUploadField({
       return
     }
     setUploadError(null)
+
+    if (aspectRatio === undefined) {
+      void uploadToStorage(file, file.name)
+      return
+    }
     openCropFor({ file, objectUrl: URL.createObjectURL(file) })
   }
 
   function handleEditExisting() {
-    if (!value) return
+    if (!value || aspectRatio === undefined) return
     setUploadError(null)
     openCropFor({ file: null, objectUrl: value })
   }
@@ -106,34 +135,11 @@ export function ImageUploadField({
 
   async function confirmCrop() {
     if (!pendingSource || !croppedArea) return
-    setIsUploading(true)
-
-    try {
-      const blob = await getCroppedImageBlob(pendingSource.objectUrl, croppedArea)
-      const supabase = createClient()
-      const path = buildUploadPath(
-        section,
-        pendingSource.file?.name ?? 'imagem.jpg',
-        crypto.randomUUID()
-      )
-      const { error: uploadErr } = await supabase.storage
-        .from('media')
-        .upload(path, blob, { contentType: blob.type })
-
-      if (uploadErr) {
-        setUploadError(`Falha no upload: ${uploadErr.message}`)
-        toast.error('Falha ao enviar a imagem.')
-        return
-      }
-
-      const { data } = supabase.storage.from('media').getPublicUrl(path)
-      onValueChange(data.publicUrl)
-      if (pendingSource.file) URL.revokeObjectURL(pendingSource.objectUrl)
-      setPendingSource(null)
-      toast.success('Imagem enviada com sucesso.')
-    } finally {
-      setIsUploading(false)
-    }
+    const blob = await getCroppedImageBlob(pendingSource.objectUrl, croppedArea)
+    const ok = await uploadToStorage(blob, pendingSource.file?.name ?? 'imagem.jpg')
+    if (!ok) return
+    if (pendingSource.file) URL.revokeObjectURL(pendingSource.objectUrl)
+    setPendingSource(null)
   }
 
   return (
@@ -142,20 +148,30 @@ export function ImageUploadField({
 
       {value && (
         <div className="flex items-center gap-3 rounded-md border border-border p-3">
-          <button
-            type="button"
-            onClick={handleEditExisting}
-            className="group relative w-28 shrink-0 overflow-hidden rounded-md ring-1 ring-border"
-            style={{ aspectRatio }}
-          >
-            <Image src={value} alt="" fill sizes="112px" className="object-cover" />
-            <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-transparent transition-colors group-hover:bg-black/60 group-hover:text-white">
-              <LuPencil className="size-4" />
-            </span>
-          </button>
+          {aspectRatio !== undefined ? (
+            <button
+              type="button"
+              onClick={handleEditExisting}
+              className="group relative w-28 shrink-0 overflow-hidden rounded-md ring-1 ring-border"
+              style={{ aspectRatio }}
+            >
+              <Image src={value} alt="" fill sizes="112px" className="object-cover" />
+              <span className="absolute inset-0 flex items-center justify-center bg-black/0 text-transparent transition-colors group-hover:bg-black/60 group-hover:text-white">
+                <LuPencil className="size-4" />
+              </span>
+            </button>
+          ) : (
+            <div className="relative h-14 w-28 shrink-0 overflow-hidden rounded-md border border-border">
+              <Image src={value} alt="" fill sizes="112px" className="object-contain" />
+            </div>
+          )}
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <p className="truncate text-sm text-foreground">{displayFilename(value)}</p>
-            <p className="text-xs text-muted-foreground">Clique na miniatura pra ajustar o recorte</p>
+            <p className="text-xs text-muted-foreground">
+              {aspectRatio !== undefined
+                ? 'Clique na miniatura pra ajustar o recorte'
+                : 'Use "Trocar" pra substituir a imagem'}
+            </p>
           </div>
           <Button
             type="button"
@@ -236,16 +252,18 @@ export function ImageUploadField({
                 <p className="truncate text-xs text-muted-foreground">{pendingSource.file.name}</p>
               )}
               <div className="relative h-80 w-full bg-black">
-                <Cropper
-                  image={pendingSource.objectUrl}
-                  crop={crop}
-                  zoom={zoom}
-                  rotation={0}
-                  aspect={aspectRatio}
-                  onCropChange={setCrop}
-                  onZoomChange={setZoom}
-                  onCropComplete={(_, area) => setCroppedArea(area)}
-                />
+                {aspectRatio !== undefined && (
+                  <Cropper
+                    image={pendingSource.objectUrl}
+                    crop={crop}
+                    zoom={zoom}
+                    rotation={0}
+                    aspect={aspectRatio}
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={(_, area) => setCroppedArea(area)}
+                  />
+                )}
               </div>
             </>
           )}
