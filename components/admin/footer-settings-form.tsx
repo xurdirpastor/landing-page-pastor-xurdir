@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import { LuLoaderCircle } from 'react-icons/lu'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 import { ImageUploadField } from '@/components/admin/image-upload-field'
 import { FormSection } from '@/components/admin/form-section'
 import { saveFooterSettings } from '@/lib/actions/footer-settings'
@@ -14,12 +15,14 @@ import type { FooterSettingsInput } from '@/lib/schemas/footer-settings'
 
 type FooterSettingsFormProps = { initialValues: FooterSettingsInput }
 
-const institutionalFields: Array<{ key: keyof FooterSettingsInput; label: string }> = [
+type TextFieldKey = 'cnpj' | 'address' | 'instagramUrl' | 'youtubeUrl' | 'whatsappUrl'
+
+const institutionalFields: Array<{ key: TextFieldKey; label: string }> = [
   { key: 'cnpj', label: 'CNPJ' },
   { key: 'address', label: 'Endereço' },
 ]
 
-const socialFields: Array<{ key: keyof FooterSettingsInput; label: string }> = [
+const socialFields: Array<{ key: TextFieldKey; label: string }> = [
   { key: 'instagramUrl', label: 'Link do Instagram' },
   { key: 'youtubeUrl', label: 'Link do YouTube' },
   { key: 'whatsappUrl', label: 'Link do WhatsApp' },
@@ -43,7 +46,7 @@ export function FooterSettingsForm({ initialValues }: FooterSettingsFormProps) {
     })
   }
 
-  function renderField({ key, label }: { key: keyof FooterSettingsInput; label: string }) {
+  function renderField({ key, label }: { key: TextFieldKey; label: string }) {
     return (
       <Field.Root key={key} name={key} className="flex flex-col gap-1.5">
         <Field.Label>{label}</Field.Label>
@@ -64,10 +67,16 @@ export function FooterSettingsForm({ initialValues }: FooterSettingsFormProps) {
           name="logoUrl"
           label="Logo do site (usado no cabeçalho e no rodapé)"
           section="profile"
-          aspectRatio={1}
           value={values.logoUrl}
           onValueChange={(url) => setValues((v) => ({ ...v, logoUrl: url }))}
         />
+        <Field.Root name="showLogoText" className="flex flex-row items-center justify-between gap-3">
+          <Field.Label>Mostrar nome do ministério ao lado da logo</Field.Label>
+          <Switch
+            checked={values.showLogoText}
+            onCheckedChange={(checked) => setValues((v) => ({ ...v, showLogoText: checked }))}
+          />
+        </Field.Root>
       </FormSection>
 
       <FormSection title="Dados institucionais">{institutionalFields.map(renderField)}</FormSection>
