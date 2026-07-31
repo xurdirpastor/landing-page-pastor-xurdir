@@ -1,16 +1,36 @@
-import Image from 'next/image'
+type LogoMarkSize = 'nav' | 'footer'
 
-export function LogoMark({ logoUrl }: { logoUrl?: string | null }) {
+const IMAGE_HEIGHT_CLASS: Record<LogoMarkSize, string> = {
+  nav: 'h-9',
+  footer: 'h-12',
+}
+
+const FALLBACK_SIZE_CLASS: Record<LogoMarkSize, string> = {
+  nav: 'size-9',
+  footer: 'size-12',
+}
+
+export function LogoMark({
+  logoUrl,
+  size = 'nav',
+}: {
+  logoUrl?: string | null
+  size?: LogoMarkSize
+}) {
   if (logoUrl) {
     return (
-      <span className="relative block size-9 shrink-0 overflow-hidden rounded-full">
-        <Image src={logoUrl} alt="Seja Livre" fill sizes="36px" className="object-cover" />
-      </span>
+      <img
+        src={logoUrl}
+        alt="Seja Livre"
+        className={`w-auto shrink-0 object-contain ${IMAGE_HEIGHT_CLASS[size]}`}
+      />
     )
   }
 
   return (
-    <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-blue-primary text-sm font-bold text-primary-foreground">
+    <span
+      className={`flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-blue-primary text-sm font-bold text-primary-foreground ${FALLBACK_SIZE_CLASS[size]}`}
+    >
       SL
     </span>
   )
